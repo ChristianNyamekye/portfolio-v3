@@ -186,57 +186,67 @@ function ImmersiveProject({ project, index }: { project: typeof featuredProjects
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   NOTABLE ROW — hover-reactive rows with physical feel
-   ═══════════════════════════════════════════════════════════ */
-function NotableRow({ project, index }: { project: typeof notableProjects[0]; index: number }) {
+/* ─── Media display (image or video) ───────────────────── */
+function ProjectMedia({ project, height = 'h-64 md:h-72' }: { project: { name: string; image?: string; video?: string }; height?: string }) {
+  if (project.video) {
+    return (
+      <div className={`relative w-full ${height} overflow-hidden bg-surface-2`}>
+        <video src={project.video} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+      </div>
+    )
+  }
+  if (project.image) {
+    return (
+      <div className={`relative w-full ${height} overflow-hidden bg-surface-2`}>
+        <img src={project.image} alt={project.name} className="w-full h-full object-cover" />
+      </div>
+    )
+  }
+  return <div className={`w-full ${height} bg-surface-2`} />
+}
+
+/* ─── Notable card (Tier 2) — original grid style ──────── */
+function NotableCard({ project, index }: { project: typeof notableProjects[0]; index: number }) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.06 }}
-      className="group"
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.08 }}
+      className="group card-base card-hover flex flex-col overflow-hidden h-full"
     >
-      <a
-        href={project.link || project.github || '#'}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-between py-6 md:py-7 border-b border-border/50 hover:border-accent/30 transition-all duration-300 px-2 -mx-2 hover:px-4 hover:-mx-4 hover:bg-surface/30 rounded-lg"
-      >
-        <div className="flex items-center gap-5 flex-1 min-w-0">
-          {/* Thumbnail */}
-          {(project.image || project.video) && (
-            <div className="hidden sm:block w-14 h-14 rounded-xl overflow-hidden bg-surface-2 shrink-0 group-hover:scale-105 transition-transform duration-300">
-              {project.video ? (
-                <video src={project.video} className="w-full h-full object-cover" muted playsInline autoPlay loop />
-              ) : (
-                <img src={project.image} alt="" className="w-full h-full object-cover" />
-              )}
-            </div>
-          )}
-          <div className="min-w-0">
-            <h4 className="font-semibold text-text text-base md:text-lg group-hover:text-accent transition-colors duration-200 truncate">
-              {project.name}
-            </h4>
-            <p className="text-xs text-muted truncate max-w-md mt-1">{project.description}</p>
+      <ProjectMedia project={project} height="h-40" />
+
+      <div className="p-6 flex flex-col flex-1">
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <h3 className="font-semibold text-text text-base">{project.name}</h3>
+          <div className="flex gap-1.5 shrink-0">
+            {project.github && (
+              <a href={project.github} target="_blank" rel="noopener noreferrer"
+                className="p-1.5 text-muted hover:text-text transition-colors" aria-label="GitHub">
+                <Github size={14} />
+              </a>
+            )}
+            {project.link && (
+              <a href={project.link} target="_blank" rel="noopener noreferrer"
+                className="p-1.5 text-muted hover:text-text transition-colors" aria-label="Live">
+                <ArrowUpRight size={14} />
+              </a>
+            )}
           </div>
         </div>
-        <div className="flex items-center gap-3 shrink-0 ml-4">
-          <div className="hidden md:flex gap-2">
-            {project.tags.slice(0, 2).map((tag) => (
-              <span key={tag} className="tag-base text-[10px]">{tag}</span>
-            ))}
-          </div>
-          <ArrowUpRight
-            size={18}
-            className="text-muted group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
-          />
+
+        <p className="text-muted text-sm leading-relaxed flex-1 mb-4">{project.description}</p>
+
+        <div className="flex flex-wrap gap-1.5 mt-auto">
+          {project.tags.map((tag) => (
+            <span key={tag} className="tag-base text-[11px]">{tag}</span>
+          ))}
         </div>
-      </a>
+      </div>
     </motion.div>
   )
 }
@@ -295,9 +305,9 @@ export default function Projects() {
             <div className="flex-1 h-px bg-border" />
           </motion.div>
 
-          <div className="border-t border-border/50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {notableProjects.map((project, i) => (
-              <NotableRow key={project.name} project={project} index={i} />
+              <NotableCard key={project.name} project={project} index={i} />
             ))}
           </div>
         </div>
