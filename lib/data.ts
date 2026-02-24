@@ -121,7 +121,7 @@ export const featuredProjects: FeaturedProject[] = [
       'The economics of robotics training data are broken - motion capture rigs cost $8,700+. EgoDex rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
     tags: ['Swift', 'CoreML', 'Next.js', 'Python', 'Computer Vision', 'Robotics'],
     status: 'Active',
-    video: asset('/egodex-demo.mov'),
+    video: asset('/egodex-hq.mp4'),
     github: 'https://github.com/ChristianNyamekye/egodex',
   },
   {
@@ -131,7 +131,7 @@ export const featuredProjects: FeaturedProject[] = [
     description:
       'Uses Tobii eye-tracking to build a real-time gaze model that adapts the reading environment - dynamic line highlighting, distraction removal, and comprehension nudges. Full service architecture with a user study in design.',
     tags: ['TypeScript', 'Chrome Extension APIs', 'Tobii SDK', 'Python', 'Accessibility'],
-    image: asset('/garb.gif'),
+    video: asset('/garb.mp4'),
     status: 'Development',
     github: 'https://github.com/ChristianNyamekye/garb-2024',
   },
