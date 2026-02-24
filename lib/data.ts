@@ -186,6 +186,7 @@ export const notableProjects: NotableProject[] = [
     description:
       'Transaction processing backend with ACID guarantees, idempotency keys, and concurrent write safety under failure conditions.',
     tags: ['TypeScript', 'Node.js', 'SQL', 'Concurrency', 'Backend'],
+    video: asset('/payment-system.mp4'),
     github: 'https://github.com/ChristianNyamekye/transfer-backend',
   },
   {
