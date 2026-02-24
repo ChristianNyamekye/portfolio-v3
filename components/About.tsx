@@ -162,7 +162,7 @@ export default function About() {
                   <span className="text-accent text-sm">🤖</span>
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-text">EgoDex</div>
+                  <div className="text-xs font-semibold text-text">DexCrowd</div>
                   <div className="text-xs text-muted">Robotics data platform</div>
                 </div>
               </div>

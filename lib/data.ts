@@ -114,14 +114,14 @@ export interface FeaturedProject {
 
 export const featuredProjects: FeaturedProject[] = [
   {
-    id: 'egodex',
-    name: 'EgoDex',
+    id: 'dexcrowd',
+    name: 'DexCrowd',
     tagline: 'Crowdsourced manipulation data for humanoid robots',
     description:
-      'The economics of robotics training data are broken - motion capture rigs cost $8,700+. EgoDex rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
+      'The economics of robotics training data are broken - motion capture rigs cost $8,700+. DexCrowd rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
     tags: ['Swift', 'CoreML', 'Next.js', 'Python', 'Computer Vision', 'Robotics'],
     status: 'Active',
-    video: asset('/egodex-demo.mp4'),
+    video: asset('/dexcrowd-sim.mp4'),
     github: 'https://github.com/ChristianNyamekye/egodex',
   },
   {

@@ -91,8 +91,8 @@ LinkedIn: https://linkedin.com/in/christian-k-nyamekye
 
 ── FEATURED PROJECTS ──
 
-1. EgoDex (Active)
-   Crowdsourced manipulation data for humanoid robots. The economics of robotics training data are broken — motion capture rigs cost $8,700+. EgoDex rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.
+1. DexCrowd (Active)
+   Crowdsourced manipulation data for humanoid robots. The economics of robotics training data are broken — motion capture rigs cost $8,700+. DexCrowd rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.
    Stack: Swift, CoreML, Next.js, Python, Computer Vision, Robotics.
    GitHub: https://github.com/ChristianNyamekye/egodex
 

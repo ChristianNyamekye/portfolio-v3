@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   keywords: [
     'Christian Nyamekye',
     'robotics data',
-    'EgoDex',
+    'DexCrowd',
     'Dartmouth EE CS',
     'software engineer',
     'machine learning',
@@ -70,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: 'Christian Nyamekye',
               url: 'https://christiannyamekye.com',
               jobTitle: 'Software Engineer & Founder',
-              description: 'Dartmouth EE+CS. Building EgoDex — crowdsourced manipulation training data for humanoid robots.',
+              description: 'Dartmouth EE+CS. Building DexCrowd — crowdsourced manipulation training data for humanoid robots.',
               alumniOf: {
                 '@type': 'CollegeOrUniversity',
                 name: 'Dartmouth College',
