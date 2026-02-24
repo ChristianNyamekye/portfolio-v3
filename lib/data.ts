@@ -121,7 +121,7 @@ export const featuredProjects: FeaturedProject[] = [
       'The economics of robotics training data are broken - motion capture rigs cost $8,700+. EgoDex rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
     tags: ['Swift', 'CoreML', 'Next.js', 'Python', 'Computer Vision', 'Robotics'],
     status: 'Active',
-    video: asset('/egodex-demo.mp4'),
+    video: asset('/egodex-demo.mov'),
     github: 'https://github.com/ChristianNyamekye/egodex',
   },
   {
@@ -134,18 +134,6 @@ export const featuredProjects: FeaturedProject[] = [
     image: asset('/garb.gif'),
     status: 'Development',
     github: 'https://github.com/ChristianNyamekye/garb-2024',
-  },
-  {
-    id: 'echecsai',
-    name: 'EchecsAI',
-    tagline: 'Real-time Stockfish analysis - explained',
-    description:
-      'Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.',
-    tags: ['TypeScript', 'Stockfish', 'Chrome APIs', 'GCP Functions', 'Vercel'],
-    image: asset('/echecsai.png'),
-    status: 'Live',
-    link: 'https://echecsai.vercel.app',
-    github: 'https://github.com/ChristianNyamekye/EchecsAI',
   },
   {
     id: 'spot',
@@ -171,6 +159,15 @@ export interface NotableProject {
 }
 
 export const notableProjects: NotableProject[] = [
+  {
+    name: 'EchecsAI',
+    description:
+      'Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.',
+    tags: ['TypeScript', 'Stockfish', 'Chrome APIs', 'GCP Functions', 'Vercel'],
+    image: asset('/echecsai.png'),
+    link: 'https://echecsai.vercel.app',
+    github: 'https://github.com/ChristianNyamekye/EchecsAI',
+  },
   {
     name: 'Duck Car',
     description:
