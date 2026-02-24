@@ -3,6 +3,10 @@
 // Update this file to change any text/links/projects on the site
 // ============================================================
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || ''
+/** Prefix local assets with basePath for GH Pages compatibility */
+const asset = (path: string) => `${BASE}${path}`
+
 export const meta = {
   name: 'Christian Nyamekye',
   title: 'Christian Nyamekye - Engineer, Builder, Founder',
@@ -117,7 +121,7 @@ export const featuredProjects: FeaturedProject[] = [
       'The economics of robotics training data are broken - motion capture rigs cost $8,700+. EgoDex rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
     tags: ['Swift', 'CoreML', 'Next.js', 'Python', 'Computer Vision', 'Robotics'],
     status: 'Active',
-    video: '/egodex-demo.mov',
+    video: asset('/egodex-demo.mov'),
     github: 'https://github.com/ChristianNyamekye/egodex',
   },
   {
@@ -127,7 +131,7 @@ export const featuredProjects: FeaturedProject[] = [
     description:
       'Uses Tobii eye-tracking to build a real-time gaze model that adapts the reading environment - dynamic line highlighting, distraction removal, and comprehension nudges. Full service architecture with a user study in design.',
     tags: ['TypeScript', 'Chrome Extension APIs', 'Tobii SDK', 'Python', 'Accessibility'],
-    image: '/garb.gif',
+    image: asset('/garb.gif'),
     status: 'Development',
     github: 'https://github.com/ChristianNyamekye/garb-2024',
   },
@@ -138,7 +142,7 @@ export const featuredProjects: FeaturedProject[] = [
     description:
       'Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.',
     tags: ['TypeScript', 'Stockfish', 'Chrome APIs', 'GCP Functions', 'Vercel'],
-    image: '/echecsai.png',
+    image: asset('/echecsai.png'),
     status: 'Live',
     link: 'https://echecsai.vercel.app',
     github: 'https://github.com/ChristianNyamekye/EchecsAI',
@@ -172,7 +176,7 @@ export const notableProjects: NotableProject[] = [
     description:
       'Control systems project: autonomous vehicle with IR-based lane following, ultrasonic obstacle avoidance, PID-tuned motor control, and real-time sensor fusion.',
     tags: ['Control Systems', 'PID', 'Embedded C', 'Sensors'],
-    video: '/duck-car.mov',
+    video: asset('/duck-car.mov'),
   },
   {
     name: 'Listserv',
@@ -180,14 +184,14 @@ export const notableProjects: NotableProject[] = [
       'Email list management system with subscription/unsubscribe flows, bounce handling, and scheduled digest delivery.',
     tags: ['Python', 'SMTP', 'Email', 'Systems'],
     link: 'https://listservcal.tech',
-    image: '/listserv.png',
+    image: asset('/listserv.png'),
   },
   {
     name: 'AM/FM Radio',
     description:
       'Built a fully functional AM/FM receiver from discrete analog components - LC tank circuits, superheterodyne architecture, PCB designed end-to-end.',
     tags: ['Analog Circuits', 'RF Design', 'PCB Layout'],
-    image: '/amfm-radio.png',
+    image: asset('/amfm-radio.png'),
   },
   {
     name: 'Payment Transactions',
@@ -201,7 +205,7 @@ export const notableProjects: NotableProject[] = [
     description:
       'Full-stack book-sharing platform - Express/MongoDB API, React client with Google Books integration and community lending queues.',
     tags: ['Node.js', 'Express', 'MongoDB', 'React', 'REST API'],
-    image: '/biblio.png',
+    image: asset('/biblio.png'),
     github: 'https://github.com/ChristianNyamekye/biblio-client',
     link: 'https://project-client-biblio.onrender.com',
   },
@@ -258,7 +262,7 @@ export const otherProjects: OtherProject[] = [
     description:
       'PID-controlled extrusion system for 3D printer filament with closed-loop temperature control and touchscreen HMI.',
     tags: ['Python', 'Arduino', 'PID Control', 'Hardware', 'Control Theory'],
-    video: '/filament-extruder.mov',
+    video: asset('/filament-extruder.mov'),
     link: 'https://www.instagram.com/thayerschool/reel/Ctr-0E5NCU5/',
   },
   {

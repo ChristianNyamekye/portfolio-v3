@@ -113,7 +113,7 @@ export default function About() {
                 {/* Headshot */}
                 <div className="w-32 h-32 rounded-full bg-surface-2 border-2 border-border overflow-hidden mb-6">
                   <img
-                    src="/headshot.jpg"
+                    src={`${process.env.NEXT_PUBLIC_BASE_PATH || ''}/headshot.jpg`}
                     alt="Christian Nyamekye"
                     className="w-full h-full object-cover"
                   />
