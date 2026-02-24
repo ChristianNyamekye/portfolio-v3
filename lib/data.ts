@@ -274,7 +274,7 @@ export const otherProjects: OtherProject[] = [
       'Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.',
     tags: ['TypeScript', 'Stockfish', 'Chrome APIs', 'GCP Functions', 'Vercel'],
     image: asset('/echecsai.png'),
-    link: 'https://echecsai.vercel.app',
+    link: 'https://echecsai-r2rhxw7zo-christiannyamekyes-projects.vercel.app/',
     github: 'https://github.com/ChristianNyamekye/EchecsAI',
   },
 ]
