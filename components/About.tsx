@@ -136,7 +136,7 @@ export default function About() {
                     >
                       <div className="text-lg font-semibold text-text">
                         {'numeric' in stat ? (
-                          <CountUp target={stat.numeric} suffix={stat.suffix} />
+                          <CountUp target={stat.numeric!} suffix={stat.suffix} />
                         ) : (
                           stat.value
                         )}
