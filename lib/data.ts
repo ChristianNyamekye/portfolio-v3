@@ -190,13 +190,10 @@ export const notableProjects: NotableProject[] = [
     github: 'https://github.com/ChristianNyamekye/transfer-backend',
   },
   {
-    name: 'EchecsAI',
+    name: 'Maze',
     description:
-      'Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.',
-    tags: ['TypeScript', 'Stockfish', 'Chrome APIs', 'GCP Functions', 'Vercel'],
-    image: asset('/echecsai.png'),
-    link: 'https://echecsai.vercel.app',
-    github: 'https://github.com/ChristianNyamekye/EchecsAI',
+      'Embedded systems maze-solving robot with procedural generation, multi-algorithm pathfinding (BFS, DFS, A*), and real-time visualization.',
+    tags: ['Embedded C', 'Algorithms', 'Robotics', 'Sensors'],
   },
   {
     name: 'Biblio',
@@ -271,9 +268,12 @@ export const otherProjects: OtherProject[] = [
     github: 'https://github.com/ChristianNyamekye/ai-driven-chatbox',
   },
   {
-    name: 'Maze',
+    name: 'EchecsAI',
     description:
-      'Embedded systems maze-solving robot with procedural generation, multi-algorithm pathfinding (BFS, DFS, A*), and real-time visualization.',
-    tags: ['Embedded C', 'Algorithms', 'Robotics', 'Sensors'],
+      'Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.',
+    tags: ['TypeScript', 'Stockfish', 'Chrome APIs', 'GCP Functions', 'Vercel'],
+    image: asset('/echecsai.png'),
+    link: 'https://echecsai.vercel.app',
+    github: 'https://github.com/ChristianNyamekye/EchecsAI',
   },
 ]
