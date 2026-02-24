@@ -7,32 +7,19 @@ export const metadata: Metadata = {
   title: meta.title,
   description: meta.description,
   keywords: [
-    'Christian Nyamekye',
-    'robotics data',
-    'EgoDex',
-    'Dartmouth EE CS',
-    'software engineer',
-    'machine learning',
-    'embedded systems',
-    'full stack developer',
+    'Christian Nyamekye', 'robotics', 'EgoDex', 'Dartmouth',
+    'software engineer', 'embedded systems', 'machine learning',
   ],
-  authors: [{ name: 'Christian Nyamekye', url: meta.url }],
-  creator: 'Christian Nyamekye',
+  authors: [{ name: meta.name, url: meta.url }],
+  creator: meta.name,
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: meta.url,
     title: meta.title,
     description: meta.description,
-    siteName: 'Christian Nyamekye',
-    images: [
-      {
-        url: `${meta.url}/og.png`,
-        width: 1200,
-        height: 630,
-        alt: 'Christian Nyamekye — Building the future of robotics data',
-      },
-    ],
+    siteName: meta.name,
+    images: [{ url: `${meta.url}/og.png`, width: 1200, height: 630, alt: meta.title }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -41,61 +28,33 @@ export const metadata: Metadata = {
     creator: '@printlnxristian',
     images: [`${meta.url}/og.png`],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  icons: {
-    icon: '/icon.svg',
-  },
+  robots: { index: true, follow: true },
+  icons: { icon: '/icon.svg' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Person',
-              name: 'Christian Nyamekye',
-              url: 'https://christiannyamekye.com',
+              name: meta.name,
+              url: meta.url,
               jobTitle: 'Software Engineer & Founder',
-              description: 'Dartmouth EE+CS. Building EgoDex — crowdsourced manipulation training data for humanoid robots.',
-              alumniOf: {
-                '@type': 'CollegeOrUniversity',
-                name: 'Dartmouth College',
-              },
-              sameAs: [
-                'https://github.com/ChristianNyamekye',
-                'https://linkedin.com/in/christian-k-nyamekye',
-                'https://x.com/printlnxristian',
-              ],
-              knowsAbout: ['Robotics', 'Embedded Systems', 'Applied ML', 'Full-Stack Development', 'Hardware Design'],
+              alumniOf: { '@type': 'CollegeOrUniversity', name: 'Dartmouth College' },
+              sameAs: Object.values(meta.social),
             }),
           }}
         />
-        {/* Theme flash prevention */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{const t=localStorage.getItem('theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme:light)').matches))document.documentElement.classList.add('light')}catch(e){}`,
-          }}
-        />
       </head>
-      <body className="noise-overlay">
-        {children}
-        {/* Chatbot placeholder — mount a widget here */}
-        <div id="chatbot-root" aria-hidden="true" />
-      </body>
+      <body>{children}</body>
     </html>
   )
 }
