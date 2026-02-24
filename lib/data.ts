@@ -121,7 +121,7 @@ export const featuredProjects: FeaturedProject[] = [
       'The economics of robotics training data are broken - motion capture rigs cost $8,700+. DexCrowd rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
     tags: ['Swift', 'CoreML', 'Next.js', 'Python', 'Computer Vision', 'Robotics'],
     status: 'Active',
-    video: asset('/dexcrowd-sim.mp4'),
+    video: asset('/egodex-demo.mov'),
     github: 'https://github.com/ChristianNyamekye/egodex',
   },
   {
@@ -226,6 +226,7 @@ export const otherProjects: OtherProject[] = [
     description:
       'Full compiler pipeline from scratch - lexer, recursive-descent parser, semantic analysis, and code generation.',
     tags: ['C', 'Compiler Design', 'Lexer', 'Parser', 'Code Generation'],
+    github: 'https://github.com/ChristianNyamekye/compilers',
   },
   {
     name: 'Nuggets Multiplayer Game',
