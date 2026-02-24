@@ -194,6 +194,7 @@ export const notableProjects: NotableProject[] = [
     description:
       'Embedded systems maze-solving robot with procedural generation, multi-algorithm pathfinding (BFS, DFS, A*), and real-time visualization.',
     tags: ['Embedded C', 'Algorithms', 'Robotics', 'Sensors'],
+    video: asset('/maze.mp4'),
   },
   {
     name: 'Biblio',
