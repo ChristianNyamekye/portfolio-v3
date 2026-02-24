@@ -160,15 +160,6 @@ export interface NotableProject {
 
 export const notableProjects: NotableProject[] = [
   {
-    name: 'EchecsAI',
-    description:
-      'Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.',
-    tags: ['TypeScript', 'Stockfish', 'Chrome APIs', 'GCP Functions', 'Vercel'],
-    image: asset('/echecsai.png'),
-    link: 'https://echecsai.vercel.app',
-    github: 'https://github.com/ChristianNyamekye/EchecsAI',
-  },
-  {
     name: 'Duck Car',
     description:
       'Control systems project: autonomous vehicle with IR-based lane following, ultrasonic obstacle avoidance, PID-tuned motor control, and real-time sensor fusion.',
@@ -196,6 +187,15 @@ export const notableProjects: NotableProject[] = [
       'Transaction processing backend with ACID guarantees, idempotency keys, and concurrent write safety under failure conditions.',
     tags: ['TypeScript', 'Node.js', 'SQL', 'Concurrency', 'Backend'],
     github: 'https://github.com/ChristianNyamekye/transfer-backend',
+  },
+  {
+    name: 'EchecsAI',
+    description:
+      'Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.',
+    tags: ['TypeScript', 'Stockfish', 'Chrome APIs', 'GCP Functions', 'Vercel'],
+    image: asset('/echecsai.png'),
+    link: 'https://echecsai.vercel.app',
+    github: 'https://github.com/ChristianNyamekye/EchecsAI',
   },
   {
     name: 'Biblio',
