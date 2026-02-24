@@ -121,7 +121,7 @@ export const featuredProjects: FeaturedProject[] = [
       'The economics of robotics training data are broken - motion capture rigs cost $8,700+. EgoDex rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
     tags: ['Swift', 'CoreML', 'Next.js', 'Python', 'Computer Vision', 'Robotics'],
     status: 'Active',
-    video: asset('/egodex-hq.mp4'),
+    video: asset('/egodex-demo.mp4'),
     github: 'https://github.com/ChristianNyamekye/egodex',
   },
   {
