@@ -30,7 +30,6 @@ export default function Home() {
           <About />
           <div className="gradient-line mx-auto max-w-[1440px] section-padding" />
           <Experience />
-          <div className="gradient-line mx-auto max-w-[1440px] section-padding" />
           <Projects />
           <OtherProjects />
           <Contact />

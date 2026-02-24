@@ -1,96 +1,61 @@
 'use client'
 
-import { useRef, useMemo } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { useRef, useMemo, useEffect, useState } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-/* ─── Option C — Torus Knot Wireframe ─────────────────── */
-function TorusKnotArt() {
+/* ─── Mouse-reactive Torus Knot ────────────────────────── */
+function InteractiveTorusKnot() {
   const groupRef = useRef<THREE.Group>(null)
+  const mouseRef = useRef({ x: 0, y: 0 })
+  const smoothMouse = useRef({ x: 0, y: 0 })
 
   const edgesGeo = useMemo(() => {
     const knot = new THREE.TorusKnotGeometry(1.2, 0.35, 128, 16, 2, 3)
     return new THREE.EdgesGeometry(knot, 15)
   }, [])
 
-  useFrame((state) => {
-    if (groupRef.current) {
-      const t = state.clock.elapsedTime * 0.12
-      groupRef.current.rotation.y = t
-      groupRef.current.rotation.x = Math.sin(t * 0.4) * 0.1
+  // Track mouse globally
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      mouseRef.current.x = (e.clientX / window.innerWidth - 0.5) * 2
+      mouseRef.current.y = (e.clientY / window.innerHeight - 0.5) * 2
     }
+    window.addEventListener('mousemove', onMove, { passive: true })
+    return () => window.removeEventListener('mousemove', onMove)
+  }, [])
+
+  useFrame((state) => {
+    if (!groupRef.current) return
+    const t = state.clock.elapsedTime * 0.1
+
+    // Smooth mouse follow
+    smoothMouse.current.x += (mouseRef.current.x - smoothMouse.current.x) * 0.03
+    smoothMouse.current.y += (mouseRef.current.y - smoothMouse.current.y) * 0.03
+
+    // Base rotation + mouse influence
+    groupRef.current.rotation.y = t + smoothMouse.current.x * 0.5
+    groupRef.current.rotation.x = Math.sin(t * 0.4) * 0.1 + smoothMouse.current.y * 0.3
   })
 
   return (
     <group ref={groupRef} scale={1.1}>
       <lineSegments geometry={edgesGeo}>
-        <lineBasicMaterial color="#60a5fa" transparent opacity={0.18} />
+        <lineBasicMaterial color="#60a5fa" transparent opacity={0.2} />
       </lineSegments>
-    </group>
-  )
-}
-
-/* ─── Floating Octahedron (section divider) ────────────── */
-function FloatingOctahedron({ size = 0.6, speed = 0.2 }: { size?: number; speed?: number }) {
-  const ref = useRef<THREE.Group>(null)
-
-  const wireGeo = useMemo(() => {
-    const geo = new THREE.OctahedronGeometry(size)
-    return new THREE.EdgesGeometry(geo)
-  }, [size])
-
-  useFrame((state, delta) => {
-    if (ref.current) {
-      ref.current.rotation.y += delta * speed
-      ref.current.rotation.z += delta * speed * 0.5
-      ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.15
-    }
-  })
-
-  return (
-    <group ref={ref}>
+      {/* Subtle inner glow mesh */}
       <mesh>
-        <octahedronGeometry args={[size]} />
-        <meshPhysicalMaterial
-          color="#3b82f6"
-          transparent
-          opacity={0.03}
-          side={THREE.DoubleSide}
-        />
+        <torusKnotGeometry args={[1.2, 0.35, 64, 8, 2, 3]} />
+        <meshBasicMaterial color="#3b82f6" transparent opacity={0.02} side={THREE.DoubleSide} />
       </mesh>
-      <lineSegments geometry={wireGeo}>
-        <lineBasicMaterial color="#3b82f6" transparent opacity={0.2} />
-      </lineSegments>
     </group>
   )
 }
 
-/* ─── Grid Sphere (contact background) ─────────────────── */
-function GridSphere() {
-  const ref = useRef<THREE.LineSegments>(null)
-
-  const wireGeo = useMemo(() => {
-    const geo = new THREE.SphereGeometry(1.8, 24, 24)
-    return new THREE.EdgesGeometry(geo, 1)
-  }, [])
-
-  useFrame((_, delta) => {
-    if (ref.current) {
-      ref.current.rotation.y += delta * 0.1
-    }
-  })
-
+/* ─── Canvas wrapper ───────────────────────────────────── */
+function SceneWrapper({ children, className = '', interactive = false }: { children: React.ReactNode; className?: string; interactive?: boolean }) {
   return (
-    <lineSegments ref={ref} geometry={wireGeo}>
-      <lineBasicMaterial color="#3b82f6" transparent opacity={0.12} />
-    </lineSegments>
-  )
-}
-
-/* ─── Canvas wrappers ──────────────────────────────────── */
-function SceneWrapper({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`pointer-events-none animate-fade-in ${className}`} style={{ animationDuration: '1s', animationFillMode: 'both' }}>
+    <div className={`${interactive ? 'pointer-events-auto' : 'pointer-events-none'} animate-fade-in ${className}`} style={{ animationDuration: '1s', animationFillMode: 'both' }}>
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
@@ -108,25 +73,11 @@ function SceneWrapper({ children, className = '' }: { children: React.ReactNode;
 
 export function HeroArt() {
   return (
-    <SceneWrapper className="absolute right-0 top-1/2 -translate-y-1/2 w-[40%] h-[70%] opacity-25 hidden lg:block">
-      <TorusKnotArt />
+    <SceneWrapper
+      interactive
+      className="absolute right-0 top-1/2 -translate-y-1/2 w-[45%] h-[80%] opacity-30 hidden lg:block"
+    >
+      <InteractiveTorusKnot />
     </SceneWrapper>
   )
 }
-
-export function SectionDivider() {
-  return (
-    <SceneWrapper className="w-full h-24 opacity-50">
-      <FloatingOctahedron />
-    </SceneWrapper>
-  )
-}
-
-export function ContactArt() {
-  return (
-    <SceneWrapper className="absolute inset-0 opacity-30">
-      <GridSphere />
-    </SceneWrapper>
-  )
-}
-
