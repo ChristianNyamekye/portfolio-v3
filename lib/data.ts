@@ -48,11 +48,12 @@ export interface ExperienceItem {
 export const experience: ExperienceItem[] = [
   {
     role: 'Software Engineering Intern',
-    org: 'Goldman Sachs',
+    org: 'Salesforce',
     period: '2025',
     description:
-      'Built internal tooling and data pipelines within the engineering division. Operated in a production-grade, high-stakes environment where correctness and scale are non-negotiable.',
-    tags: ['Python', 'Distributed Systems', 'Finance Tech'],
+      'Software Engineering Intern at Salesforce. Details coming soon.',
+    tags: ['Salesforce', 'Cloud Platform', 'Enterprise Software'],
+    link: 'https://salesforce.com',
   },
   {
     role: 'Open-Source Contributor',
@@ -102,6 +103,7 @@ export interface FeaturedProject {
   flagship?: boolean
   status?: string
   metric?: string
+  image?: string
 }
 
 export const featuredProjects: FeaturedProject[] = [
@@ -110,7 +112,7 @@ export const featuredProjects: FeaturedProject[] = [
     name: 'EgoDex',
     tagline: 'Crowdsourced manipulation data for humanoid robots',
     description:
-      'The economics of robotics training data are broken. Industry-standard motion capture rigs cost $8,700+. EgoDex rebuilds the pipeline from scratch — an iPhone + Apple Watch captures egocentric manipulation data for $950, then syndicates structured training sets to robotics labs. Full-stack platform: iOS capture app, annotation pipeline, quality control, and API. This is how the next generation of humanoid robots learns to use their hands.',
+      'The economics of robotics training data are broken — motion capture rigs cost $8,700+. EgoDex rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
     tags: ['Swift', 'CoreML', 'Next.js', 'Python', 'Computer Vision', 'Robotics'],
     flagship: true,
     status: 'Active',
@@ -122,7 +124,7 @@ export const featuredProjects: FeaturedProject[] = [
     name: 'GARB',
     tagline: 'Gaze-Aware Reading Aid for the Browser',
     description:
-      "Attention is the scarcest resource. The browser is where it goes to die. GARB uses Tobii eye-tracking to build a real-time gaze model, then adapts the reading environment around it — dynamic line highlighting, distraction removal, comprehension nudges, and focus flow. Rebuilt with a full service architecture for extensibility. A user study is in design to quantify cognitive load reduction.",
+      'Uses Tobii eye-tracking to build a real-time gaze model that adapts the reading environment — dynamic line highlighting, distraction removal, and comprehension nudges. Full service architecture with a user study in design.',
     tags: ['TypeScript', 'Chrome Extension APIs', 'Tobii SDK', 'Python', 'Accessibility'],
     status: 'Development',
     github: 'https://github.com/ChristianNyamekye/garb-2024',
@@ -132,7 +134,7 @@ export const featuredProjects: FeaturedProject[] = [
     name: 'EchecsAI',
     tagline: 'Real-time Stockfish analysis — explained',
     description:
-      'Chess improvement tools are either too shallow to learn from or too dense to parse. EchecsAI is a browser extension that brings Stockfish analysis directly to chess.com and lichess — streaming engine evaluations with human-readable explanations so players understand *why* a move is good, not just that it is. Runs on GCP Functions behind a Vercel frontend.',
+      'Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.',
     tags: ['TypeScript', 'Stockfish', 'Chrome APIs', 'GCP Functions', 'Vercel'],
     status: 'Live',
     link: 'https://echecsai.vercel.app',
@@ -143,7 +145,7 @@ export const featuredProjects: FeaturedProject[] = [
     name: 'Spot Voice Control',
     tagline: 'Boston Dynamics Spot, controlled by voice',
     description:
-      "Voice-commanding a $75,000 quadruped robot is a pipeline engineering problem. Built on a Jetson Nano, the system runs voice activity detection → ASR → intent parsing → Spot SDK dispatch in under 400ms — fast enough to feel responsive in physical space. Demonstrates natural-language interfaces for legged robotics in unstructured environments.",
+      'Voice-commanding a quadruped robot via Jetson Nano: VAD → ASR → intent parsing → Spot SDK dispatch in under 400ms. Natural-language interfaces for legged robotics.',
     tags: ['Python', 'Jetson Nano', 'VAD', 'ASR', 'Spot SDK', 'Edge ML'],
     status: 'Complete',
     github: 'https://github.com/ChristianNyamekye/spot-voice-control',
@@ -157,13 +159,14 @@ export interface NotableProject {
   tags: string[]
   link?: string
   github?: string
+  image?: string
 }
 
 export const notableProjects: NotableProject[] = [
   {
     name: 'Biblio',
     description:
-      'Full-stack book-sharing platform built with a decoupled architecture — Express/MongoDB REST API hosted on Render, React client with Google Books integration, community lending queues, and per-book comment threads.',
+      'Full-stack book-sharing platform — Express/MongoDB API, React client with Google Books integration and community lending queues.',
     tags: ['Node.js', 'Express', 'MongoDB', 'React', 'REST API'],
     github: 'https://github.com/ChristianNyamekye/biblio-api',
     link: 'https://project-api-biblio.onrender.com/',
@@ -171,25 +174,25 @@ export const notableProjects: NotableProject[] = [
   {
     name: 'AM/FM Radio',
     description:
-      'Designed and built a fully functional AM/FM receiver from discrete analog components — LC tank circuits, superheterodyne architecture, and IF filtering. PCB designed and tested end-to-end. From theory to a physical, tunable radio.',
+      'Built a fully functional AM/FM receiver from discrete analog components — LC tank circuits, superheterodyne architecture, PCB designed end-to-end.',
     tags: ['Analog Circuits', 'RF Design', 'PCB Layout', 'ENGS 32/61'],
   },
   {
     name: 'Duck Car',
     description:
-      'Autonomous and remote-controlled vehicle with obstacle avoidance, IR-based lane following, and real-time motor control. Fused ultrasonic and IR sensor inputs to navigate without human intervention.',
+      'Autonomous vehicle with IR-based lane following, ultrasonic obstacle avoidance, and real-time motor control.',
     tags: ['Embedded C', 'Sensors', 'Motor Control', 'Autonomy'],
   },
   {
     name: 'Compilers',
     description:
-      'Built a full compiler pipeline from source — lexer, recursive-descent parser, semantic analysis with symbol tables and type checking, and code generation. The project that makes every other CS course make sense.',
+      'Full compiler pipeline from scratch — lexer, recursive-descent parser, semantic analysis, and code generation.',
     tags: ['C', 'Compiler Design', 'Lexer', 'Parser', 'Code Generation'],
   },
   {
     name: 'Payment Transactions',
     description:
-      'Transaction processing backend with ACID guarantees, idempotency keys, and concurrent write safety. Simulated real payment flows with rollback, retry logic, and audit logging under failure conditions.',
+      'Transaction processing backend with ACID guarantees, idempotency keys, and concurrent write safety under failure conditions.',
     tags: ['TypeScript', 'Node.js', 'SQL', 'Concurrency', 'Backend'],
     github: 'https://github.com/ChristianNyamekye/transfer-backend',
   },
@@ -208,53 +211,53 @@ export const otherProjects: OtherProject[] = [
   {
     name: 'Nuggets Multiplayer Game',
     description:
-      'Multiplayer grid game in C over raw sockets. A server manages concurrent player state across rooms and passageways; players collect gold nuggets in real time. Supports up to 26 simultaneous players + a spectator.',
+      'Multiplayer grid game in C over raw sockets supporting up to 26 simultaneous players collecting gold nuggets in real time.',
     tags: ['C', 'Sockets', 'Networking', 'Multiplayer'],
     github: 'https://github.com/ChristianNyamekye/nuggets-multiplayer-game',
   },
   {
     name: 'Lossless Data Compression',
     description:
-      'Huffman encoding for lossless compression — variable-length code trees built from character frequency analysis, with full compress/decompress pipelines. Trees, priority queues, and maps from scratch in Java.',
+      'Huffman encoding with full compress/decompress pipelines — trees, priority queues, and maps from scratch in Java.',
     tags: ['Java', 'Huffman Encoding', 'Algorithms', 'Data Structures'],
     github: 'https://github.com/ChristianNyamekye/lossless-data-compression',
   },
   {
     name: 'Interactive Navigation System',
     description:
-      'Graph-based navigation system with Dijkstra and A* pathfinding over map data. PyQt5 GUI for interactive route visualization and shortest-path queries across node graphs.',
+      'Graph-based navigation with Dijkstra and A* pathfinding, PyQt5 GUI for interactive route visualization.',
     tags: ['Python', 'PyQt5', 'Graph Algorithms', 'A*', 'Dijkstra'],
     github: 'https://github.com/ChristianNyamekye/interactive-navigation-system',
   },
   {
     name: 'Knitting Machine IoT',
     description:
-      'Retrofitted a mechanical knitting machine with IoT sensors and a web dashboard. Pattern upload, stitch count monitoring, and error detection over a live Arduino + Python pipeline.',
+      'Retrofitted a mechanical knitting machine with IoT sensors — pattern upload, stitch monitoring, and error detection via Arduino + Python.',
     tags: ['Python', 'Arduino', 'IoT', 'Web Dashboard'],
   },
   {
     name: '3D Filament Extruder',
     description:
-      'PID-controlled extrusion system for 3D printer filament production. Closed-loop temperature and feed-rate control with a touchscreen HMI — control theory applied to a physical manufacturing process.',
+      'PID-controlled extrusion system for 3D printer filament with closed-loop temperature control and touchscreen HMI.',
     tags: ['Python', 'Arduino', 'PID Control', 'Hardware', 'Control Theory'],
   },
   {
     name: 'Mavis AI Chatbot',
     description:
-      'NLP-powered conversational assistant with intent classification, context management, and pluggable Flask backend. Custom dialog management and entity extraction without relying on a third-party NLU service.',
+      'NLP-powered conversational assistant with intent classification, context management, and custom dialog handling via Flask.',
     tags: ['Python', 'Flask', 'NLP', 'Intent Classification'],
     github: 'https://github.com/ChristianNyamekye/ai-driven-chatbox',
   },
   {
     name: 'Maze',
     description:
-      'Procedural maze generation and multi-algorithm pathfinding — DFS generation with BFS, DFS, and A* solvers visualized in real time. Benchmarked traversal efficiency across grid topologies.',
+      'Procedural maze generation with DFS and multi-algorithm pathfinding (BFS, DFS, A*) visualized in real time.',
     tags: ['Python', 'Algorithms', 'Graph Theory', 'Visualization'],
   },
   {
     name: 'Listserv',
     description:
-      'Email list management system with subscription/unsubscribe flows, bounce handling, and scheduled digest delivery. Built to handle group communication at scale without third-party ESPs.',
+      'Email list management with subscription flows, bounce handling, and scheduled digest delivery.',
     tags: ['Python', 'SMTP', 'Email', 'Systems'],
   },
 ]

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Sun, Moon } from 'lucide-react'
 import { meta } from '@/lib/data'
 
 const navLinks = [
@@ -14,6 +15,21 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+
+  useEffect(() => {
+    const saved = localStorage.getItem('theme') as 'dark' | 'light' | null
+    const preferred = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+    setTheme(preferred)
+    document.documentElement.classList.toggle('light', preferred === 'light')
+  }, [])
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    localStorage.setItem('theme', next)
+    document.documentElement.classList.toggle('light', next === 'light')
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -21,7 +37,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Lock body scroll when menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -46,9 +61,7 @@ export default function Navbar() {
             href="#"
             className="font-semibold text-text tracking-tight hover:text-accent transition-colors duration-200"
           >
-            <span className="font-mono text-accent mr-1 text-sm">{'<'}</span>
             CN
-            <span className="font-mono text-accent ml-1 text-sm">{'/>'}</span>
           </a>
 
           {/* Desktop nav */}
@@ -63,6 +76,16 @@ export default function Navbar() {
                 <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-accent transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
+
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="p-2 rounded-lg text-muted hover:text-text hover:bg-surface-2 border border-transparent hover:border-border transition-all duration-200"
+            >
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+
             <a
               href={meta.social.github}
               target="_blank"
@@ -73,28 +96,37 @@ export default function Navbar() {
             </a>
           </nav>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-surface-2 transition-colors"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
-            <motion.span
-              animate={menuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
-              transition={{ duration: 0.2 }}
-              className="block w-5 h-px bg-text"
-            />
-            <motion.span
-              animate={menuOpen ? { opacity: 0, x: -8 } : { opacity: 1, x: 0 }}
-              transition={{ duration: 0.2 }}
-              className="block w-5 h-px bg-text"
-            />
-            <motion.span
-              animate={menuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
-              transition={{ duration: 0.2 }}
-              className="block w-5 h-px bg-text"
-            />
-          </button>
+          {/* Mobile: theme toggle + menu button */}
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="p-2 rounded-lg text-muted hover:text-text transition-colors"
+            >
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+            <button
+              className="flex flex-col gap-1.5 p-2 rounded-lg hover:bg-surface-2 transition-colors"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+            >
+              <motion.span
+                animate={menuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="block w-5 h-px bg-text"
+              />
+              <motion.span
+                animate={menuOpen ? { opacity: 0, x: -8 } : { opacity: 1, x: 0 }}
+                transition={{ duration: 0.2 }}
+                className="block w-5 h-px bg-text"
+              />
+              <motion.span
+                animate={menuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="block w-5 h-px bg-text"
+              />
+            </button>
+          </div>
         </div>
       </motion.header>
 

@@ -61,7 +61,38 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Person',
+              name: 'Christian Nyamekye',
+              url: 'https://christiannyamekye.com',
+              jobTitle: 'Software Engineer & Founder',
+              description: 'Dartmouth EE+CS. Building EgoDex — crowdsourced manipulation training data for humanoid robots.',
+              alumniOf: {
+                '@type': 'CollegeOrUniversity',
+                name: 'Dartmouth College',
+              },
+              sameAs: [
+                'https://github.com/ChristianNyamekye',
+                'https://linkedin.com/in/christian-k-nyamekye',
+                'https://x.com/printlnxristian',
+              ],
+              knowsAbout: ['Robotics', 'Embedded Systems', 'Applied ML', 'Full-Stack Development', 'Hardware Design'],
+            }),
+          }}
+        />
+        {/* Theme flash prevention */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{const t=localStorage.getItem('theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme:light)').matches))document.documentElement.classList.add('light')}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="noise-overlay">
         {children}
         {/* Chatbot placeholder — mount a widget here */}

@@ -54,6 +54,27 @@ function FeaturedCard({ project, index }: { project: typeof featuredProjects[0];
           <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
         )}
 
+        {/* Project image / placeholder */}
+        <div className="relative w-full h-48 md:h-52 overflow-hidden rounded-t-2xl">
+          {project.image ? (
+            <img
+              src={project.image}
+              alt={project.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className={`w-full h-full flex items-center justify-center ${
+              project.flagship
+                ? 'bg-gradient-to-br from-accent/10 via-surface-2 to-surface'
+                : 'bg-gradient-to-br from-surface-2 to-surface'
+            }`}>
+              <span className="text-5xl font-bold text-accent/20 font-mono select-none">
+                {project.name}
+              </span>
+            </div>
+          )}
+        </div>
+
         <div className="relative p-7 md:p-9">
           {/* Top row */}
           <div className="flex items-start justify-between gap-4 mb-5">
@@ -137,8 +158,26 @@ function NotableCard({ project, index }: { project: typeof notableProjects[0]; i
       initial={{ opacity: 0, y: 30 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.08 }}
-      className="group card-base card-hover p-6 flex flex-col"
+      className="group card-base card-hover flex flex-col overflow-hidden"
     >
+      {/* Project image / placeholder */}
+      <div className="relative w-full h-32 overflow-hidden">
+        {project.image ? (
+          <img
+            src={project.image}
+            alt={project.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-2 to-surface">
+            <span className="text-3xl font-bold text-accent/15 font-mono select-none">
+              {project.name}
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="p-6 flex flex-col flex-1">
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="w-9 h-9 rounded-lg bg-surface-2 border border-border flex items-center justify-center group-hover:border-accent/30 transition-colors duration-300">
@@ -171,6 +210,7 @@ function NotableCard({ project, index }: { project: typeof notableProjects[0]; i
         {project.tags.map((tag) => (
           <span key={tag} className="tag-base text-[11px]">{tag}</span>
         ))}
+      </div>
       </div>
     </motion.div>
   )
