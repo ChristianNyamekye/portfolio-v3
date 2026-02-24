@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { ExternalLink, Github, ArrowUpRight } from 'lucide-react'
+import { useRef, useState, useEffect, useCallback } from 'react'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { ExternalLink, Github, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import { featuredProjects, notableProjects } from '@/lib/data'
 
 /* ─── Status badge ─────────────────────────────────────── */
@@ -23,124 +23,193 @@ function StatusBadge({ status }: { status?: string }) {
   )
 }
 
-/* ─── Featured card (Tier 1) ───────────────────────────── */
-function FeaturedCard({ project, index }: { project: typeof featuredProjects[0]; index: number }) {
+/* ─── Media display (image or video) ───────────────────── */
+function ProjectMedia({ project, height = 'h-64 md:h-72' }: { project: { name: string; image?: string; video?: string }; height?: string }) {
+  if (project.video) {
+    return (
+      <div className={`relative w-full ${height} overflow-hidden bg-surface-2 flex items-center justify-center`}>
+        <video
+          src={project.video}
+          className="w-full h-full object-cover object-top"
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+      </div>
+    )
+  }
+  if (project.image) {
+    return (
+      <div className={`relative w-full ${height} overflow-hidden bg-surface-2`}>
+        <img
+          src={project.image}
+          alt={project.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    )
+  }
+  return (
+    <div className={`relative w-full ${height} overflow-hidden bg-gradient-to-br from-accent/8 via-surface-2 to-surface flex items-center justify-center`}>
+      <span className="text-4xl font-bold text-accent/15 font-mono select-none">
+        {project.name}
+      </span>
+    </div>
+  )
+}
+
+/* ─── Featured Carousel — One project at a time, auto-advances ── */
+const AUTO_ADVANCE_MS = 6000
+
+function FeaturedCarousel() {
+  const [current, setCurrent] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const total = featuredProjects.length
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
+
+  const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total])
+  const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total])
+
+  // Auto-advance
+  useEffect(() => {
+    if (paused) return
+    const id = setInterval(next, AUTO_ADVANCE_MS)
+    return () => clearInterval(id)
+  }, [paused, next])
+
+  const project = featuredProjects[current]
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 50 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: index * 0.1 }}
-      className="group relative"
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      className="relative"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
     >
-      <div className={`
-        relative rounded-2xl border overflow-hidden transition-all duration-500
-        ${project.flagship
-          ? 'bg-gradient-to-br from-surface via-surface to-surface-2 border-accent/30 hover:border-accent/60'
-          : 'bg-surface border-border hover:border-border-bright'
-        }
-        hover:shadow-2xl hover:shadow-accent/5
-      `}>
-        {/* Flagship gradient header bar */}
-        {project.flagship && (
-          <div className="h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" />
-        )}
+      <div className="relative rounded-2xl overflow-hidden h-[460px] md:h-[540px] lg:h-[600px]">
+        {/* Background media */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={project.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+            className="absolute inset-0"
+          >
+            {project.video ? (
+              <video
+                src={project.video}
+                className="w-full h-full object-cover"
+                autoPlay muted loop playsInline
+              />
+            ) : project.image ? (
+              <img src={project.image} alt={project.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-surface-2" />
+            )}
+          </motion.div>
+        </AnimatePresence>
 
-        {/* Decorative bg glow on flagship */}
-        {project.flagship && (
-          <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-        )}
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/35 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10" />
 
-        {/* Project image / placeholder */}
-        <div className="relative w-full h-48 md:h-52 overflow-hidden rounded-t-2xl">
-          {project.image ? (
-            <img
-              src={project.image}
-              alt={project.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className={`w-full h-full flex items-center justify-center ${
-              project.flagship
-                ? 'bg-gradient-to-br from-accent/10 via-surface-2 to-surface'
-                : 'bg-gradient-to-br from-surface-2 to-surface'
-            }`}>
-              <span className="text-5xl font-bold text-accent/20 font-mono select-none">
-                {project.name}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="relative p-7 md:p-9">
-          {/* Top row */}
-          <div className="flex items-start justify-between gap-4 mb-5">
-            <div className="flex flex-wrap items-center gap-2">
-              {project.flagship && (
-                <span className="flagship-badge text-xs font-semibold px-3 py-1 rounded-full">
-                  ★ Flagship
-                </span>
-              )}
+        {/* Content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={project.id + '-content'}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.5 }}
+            className="relative z-10 h-full flex flex-col justify-end p-8 md:p-12 max-w-2xl"
+            style={{ textShadow: '0 1px 8px rgba(0,0,0,0.8), 0 0 30px rgba(0,0,0,0.5)' }}
+          >
+            <div className="mb-4">
               <StatusBadge status={project.status} />
             </div>
-            {/* Links */}
-            <div className="flex items-center gap-2 shrink-0">
-              {project.github && (
-                <a
-                  href={project.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="GitHub"
-                  className="p-2 rounded-lg text-subtle hover:text-text hover:bg-surface-2 border border-transparent hover:border-border transition-all duration-200"
-                >
-                  <Github size={16} />
-                </a>
-              )}
-              {project.link && (
-                <a
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Live demo"
-                  className="p-2 rounded-lg text-subtle hover:text-text hover:bg-surface-2 border border-transparent hover:border-border transition-all duration-200"
-                >
-                  <ExternalLink size={16} />
-                </a>
-              )}
+
+            <h3 className="font-bold tracking-tight text-3xl md:text-4xl lg:text-5xl text-white mb-3">
+              {project.name}
+            </h3>
+
+            {project.tagline && (
+              <p className="text-accent text-sm md:text-base font-medium mb-4">
+                {project.tagline}
+              </p>
+            )}
+
+            <p className="text-white/70 text-sm md:text-base leading-relaxed mb-6 max-w-lg">
+              {project.description}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-6">
+              <div className="flex flex-wrap gap-3">
+                {project.tags.slice(0, 5).map((tag) => (
+                  <span key={tag} className="text-xs font-mono text-white/50 bg-white/5 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 ml-auto">
+                {project.github && (
+                  <a href={project.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"
+                    className="p-2.5 rounded-xl text-white/60 hover:text-white bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 transition-all duration-200">
+                    <Github size={18} />
+                  </a>
+                )}
+                {project.link && (
+                  <a href={project.link} target="_blank" rel="noopener noreferrer" aria-label="Live demo"
+                    className="p-2.5 rounded-xl text-white/60 hover:text-white bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 transition-all duration-200">
+                    <ExternalLink size={18} />
+                  </a>
+                )}
+                {(project.github || project.link) && (
+                  <a href={project.link || project.github} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-accent/80 hover:bg-accent backdrop-blur-sm transition-all duration-200">
+                    View Project <ArrowUpRight size={14} />
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
+          </motion.div>
+        </AnimatePresence>
 
-          {/* Name & tagline */}
-          <h3 className={`font-semibold tracking-tight mb-2 ${project.flagship ? 'text-2xl md:text-3xl text-text' : 'text-xl md:text-2xl text-text'}`}>
-            {project.name}
-          </h3>
-          <p className={`font-medium mb-4 ${project.flagship ? 'text-accent text-base' : 'text-accent/80 text-sm'}`}>
-            {project.tagline}
-          </p>
+        {/* Navigation arrows */}
+        <button
+          onClick={prev}
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/5 hover:bg-white/15 backdrop-blur-sm border border-white/10 text-white/60 hover:text-white transition-all"
+          aria-label="Previous project"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <button
+          onClick={next}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/5 hover:bg-white/15 backdrop-blur-sm border border-white/10 text-white/60 hover:text-white transition-all"
+          aria-label="Next project"
+        >
+          <ChevronRight size={20} />
+        </button>
 
-          {/* Metric callout (flagship only) */}
-          {project.metric && (
-            <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/20 rounded-lg px-4 py-2 mb-5">
-              <span className="text-accent font-mono text-sm font-semibold">{project.metric}</span>
-            </div>
-          )}
-
-          {/* Description */}
-          <p className="text-muted text-sm leading-relaxed mb-6">
-            {project.description}
-          </p>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span key={tag} className="tag-base">
-                {tag}
-              </span>
-            ))}
-          </div>
+        {/* Progress dots */}
+        <div className="absolute bottom-4 right-8 md:right-12 z-20 flex items-center gap-2">
+          {featuredProjects.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === current ? 'w-6 bg-accent' : 'w-1.5 bg-white/30 hover:bg-white/50'
+              }`}
+              aria-label={`Go to project ${i + 1}`}
+            />
+          ))}
         </div>
       </div>
     </motion.div>
@@ -158,59 +227,38 @@ function NotableCard({ project, index }: { project: typeof notableProjects[0]; i
       initial={{ opacity: 0, y: 30 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.08 }}
-      className="group card-base card-hover flex flex-col overflow-hidden"
+      className="group card-base card-hover flex flex-col overflow-hidden h-full"
     >
-      {/* Project image / placeholder */}
-      <div className="relative w-full h-32 overflow-hidden">
-        {project.image ? (
-          <img
-            src={project.image}
-            alt={project.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface-2 to-surface">
-            <span className="text-3xl font-bold text-accent/15 font-mono select-none">
-              {project.name}
-            </span>
-          </div>
-        )}
-      </div>
+      {/* Media */}
+      <ProjectMedia project={project} height="h-40" />
 
       <div className="p-6 flex flex-col flex-1">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <div className="w-9 h-9 rounded-lg bg-surface-2 border border-border flex items-center justify-center group-hover:border-accent/30 transition-colors duration-300">
-          <span className="text-accent/70 text-sm">
-            {project.name.charAt(0)}
-          </span>
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <h3 className="font-semibold text-text text-base">{project.name}</h3>
+          <div className="flex gap-1.5 shrink-0">
+            {project.github && (
+              <a href={project.github} target="_blank" rel="noopener noreferrer"
+                className="p-1.5 text-muted hover:text-text transition-colors" aria-label="GitHub">
+                <Github size={14} />
+              </a>
+            )}
+            {project.link && (
+              <a href={project.link} target="_blank" rel="noopener noreferrer"
+                className="p-1.5 text-muted hover:text-text transition-colors" aria-label="Live">
+                <ArrowUpRight size={14} />
+              </a>
+            )}
+          </div>
         </div>
-        <div className="flex gap-1.5">
-          {project.github && (
-            <a href={project.github} target="_blank" rel="noopener noreferrer"
-              className="p-1.5 text-subtle hover:text-text transition-colors"
-              aria-label="GitHub">
-              <Github size={14} />
-            </a>
-          )}
-          {project.link && (
-            <a href={project.link} target="_blank" rel="noopener noreferrer"
-              className="p-1.5 text-subtle hover:text-text transition-colors"
-              aria-label="Live">
-              <ArrowUpRight size={14} />
-            </a>
-          )}
+
+        <p className="text-muted text-sm leading-relaxed flex-1 mb-4">{project.description}</p>
+
+        <div className="flex flex-wrap gap-1.5 mt-auto">
+          {project.tags.map((tag) => (
+            <span key={tag} className="tag-base text-[11px]">{tag}</span>
+          ))}
         </div>
-      </div>
-
-      <h3 className="font-semibold text-text text-base mb-2">{project.name}</h3>
-      <p className="text-muted text-sm leading-relaxed flex-1 mb-4">{project.description}</p>
-
-      <div className="flex flex-wrap gap-1.5 mt-auto">
-        {project.tags.map((tag) => (
-          <span key={tag} className="tag-base text-[11px]">{tag}</span>
-        ))}
-      </div>
       </div>
     </motion.div>
   )
@@ -223,12 +271,10 @@ export default function Projects() {
 
   return (
     <section id="projects" className="relative py-32">
-      {/* Subtle section bg */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-surface/10 to-background pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto section-padding">
-
-        {/* ── Header ── */}
+      <div className="relative max-w-[1440px] mx-auto section-padding">
+        {/* Header */}
         <div ref={headerRef} className="mb-16">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -247,37 +293,24 @@ export default function Projects() {
             className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
           >
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-text">
-              Things I've built
+              Things I&apos;ve built
             </h2>
-            <p className="text-sm text-muted max-w-sm">
-              From hardware prototypes to full-stack platforms. 17+ projects across the stack.
-            </p>
           </motion.div>
         </div>
 
-        {/* ── Tier 1: Featured (2-col on large) ── */}
-        <div className="mb-20">
-          {/* Flagship project gets full-width treatment */}
-          <div className="mb-6">
-            <FeaturedCard project={featuredProjects[0]} index={0} />
-          </div>
-
-          {/* Rest of featured in 1–2 col grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {featuredProjects.slice(1).map((project, i) => (
-              <FeaturedCard key={project.id} project={project} index={i + 1} />
-            ))}
-          </div>
+        {/* Featured — interactive carousel, one at a time */}
+        <div className="mb-32">
+          <FeaturedCarousel />
         </div>
 
-        {/* ── Tier 2: Notable projects ── */}
-        <div>
+        {/* Notable projects */}
+        <div className="mt-32">
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="flex items-center gap-4 mb-8"
+            className="flex items-center gap-4 mb-12"
           >
             <h3 className="text-sm font-mono text-muted uppercase tracking-widest">Notable</h3>
             <div className="flex-1 h-px bg-border" />
@@ -293,3 +326,4 @@ export default function Projects() {
     </section>
   )
 }
+

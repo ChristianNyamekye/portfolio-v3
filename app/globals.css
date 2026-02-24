@@ -10,9 +10,14 @@
   --surface:    #0d1117;
   --surface-2:  #161b22;
   --border:     #21262d;
+  --border-bright: #30363d;
   --accent:     #3b82f6;
+  --accent-dim: #1d4ed8;
+  --accent-glow: rgba(59,130,246,0.15);
   --text:       #e6edf3;
+  --text-dim:   #b1bac4;
   --muted:      #8b949e;
+  --subtle:     #484f58;
 }
 
 html.light {
@@ -20,9 +25,14 @@ html.light {
   --surface:    #ffffff;
   --surface-2:  #f5f5f5;
   --border:     #e5e7eb;
+  --border-bright: #d1d5db;
   --accent:     #3b82f6;
+  --accent-dim: #2563eb;
+  --accent-glow: rgba(59,130,246,0.1);
   --text:       #1a1a2e;
+  --text-dim:   #374151;
   --muted:      #6b7280;
+  --subtle:     #9ca3af;
 }
 
 html.light ::selection {
@@ -38,6 +48,35 @@ html.light ::-webkit-scrollbar-thumb {
 }
 html.light ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+html.light .noise-overlay::before {
+  opacity: 0.15;
+}
+
+html.light .mesh-orb {
+  opacity: 0.06;
+}
+
+html.light .grid-bg {
+  background-image:
+    radial-gradient(circle at center, rgba(59,130,246,0.02) 0%, transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='1' cy='1' r='1' fill='%23e5e7eb'/%3E%3C/svg%3E");
+}
+
+html.light .gradient-line {
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.2), transparent);
+}
+
+html.light .timeline-line {
+  background: linear-gradient(180deg, transparent, rgba(59,130,246,0.2) 20%, rgba(59,130,246,0.2) 80%, transparent);
+}
+
+html.light .text-gradient {
+  background: linear-gradient(135deg, #1a1a2e 0%, #6b7280 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 * {
@@ -240,8 +279,74 @@ body {
 }
 
 /* ─── Focus ring ─────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 1s ease-out both;
+}
+
+.gradient-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.15), transparent);
+}
+
 :focus-visible {
   outline: 2px solid rgba(59,130,246,0.6);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* ─── Animated gradient border for featured project cards ─── */
+@property --grad-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.gradient-border-animated {
+  background: conic-gradient(
+    from var(--grad-angle),
+    #3b82f6 0%,
+    #818cf8 25%,
+    #06b6d4 50%,
+    #3b82f6 75%,
+    #818cf8 100%
+  );
+  animation: spin-grad-border 4s linear infinite;
+}
+
+@keyframes spin-grad-border {
+  to { --grad-angle: 360deg; }
+}
+
+/* ─── AI Assistant floating button pulse ─────────────────── */
+.ai-pulse {
+  animation: ai-button-pulse 3s ease-in-out infinite;
+}
+
+@keyframes ai-button-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59,130,246,0.4), 0 4px 20px rgba(59,130,246,0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59,130,246,0), 0 4px 20px rgba(59,130,246,0.25);
+  }
+}
+
+/* ─── Thin scrollbar for chat panel ─────────────────────── */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
 }

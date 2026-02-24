@@ -7,7 +7,7 @@ export default function Footer() {
 
   return (
     <footer className="relative border-t border-border/50 py-8">
-      <div className="max-w-7xl mx-auto section-padding flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="max-w-[1440px] mx-auto section-padding flex flex-col sm:flex-row items-center justify-between gap-4">
         <span className="text-sm text-muted">
           © {year} Christian Nyamekye
         </span>
@@ -42,3 +42,4 @@ export default function Footer() {
     </footer>
   )
 }
+

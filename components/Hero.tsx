@@ -1,8 +1,11 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 import { ArrowDown, Github, Linkedin, Twitter, Instagram } from 'lucide-react'
 import { hero, meta } from '@/lib/data'
+import ParticleCanvas from './ParticleCanvas'
+import { HeroArt } from './ArtScene'
 
 const socials = [
   { icon: Github, href: meta.social.github, label: 'GitHub' },
@@ -23,12 +26,22 @@ const itemVariants = {
 
 export default function Hero() {
   const headlineLines = hero.headline.split('\n')
+  const sectionRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 80])
+  const particleY = useTransform(scrollYProgress, [0, 1], [0, 150])
 
   return (
     <section
+      ref={sectionRef}
       id="hero"
       className="relative min-h-screen flex flex-col justify-center overflow-hidden grid-bg"
     >
+      {/* Particle constellation background */}
+      <motion.div style={{ y: particleY }} className="absolute inset-0">
+        <ParticleCanvas />
+      </motion.div>
+
       {/* Animated orbs */}
       <div className="mesh-bg">
         <div className="mesh-orb mesh-orb-1" />
@@ -36,11 +49,14 @@ export default function Hero() {
         <div className="mesh-orb mesh-orb-3" />
       </div>
 
+      {/* 3D Art — right side */}
+      <HeroArt />
+
       {/* Vignette bottom */}
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto section-padding w-full pt-28 pb-20">
+      <motion.div style={{ y: contentY }} className="relative z-10 max-w-[1440px] mx-auto section-padding w-full pt-28 pb-20">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -50,25 +66,52 @@ export default function Hero() {
           {/* Eyebrow */}
           <motion.div variants={itemVariants} className="flex items-center gap-3 mb-8">
             <div className="status-dot-active" />
-            <span className="text-sm font-mono text-muted tracking-widest uppercase">
-              {hero.eyebrow}
-            </span>
+            {hero.eyebrowLink ? (
+              <a
+                href={hero.eyebrowLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-mono text-muted tracking-widest uppercase hover:text-accent transition-colors duration-200"
+              >
+                {hero.eyebrow}
+              </a>
+            ) : (
+              <span className="text-sm font-mono text-muted tracking-widest uppercase">
+                {hero.eyebrow}
+              </span>
+            )}
           </motion.div>
 
-          {/* Headline */}
+          {/* Headline — word-by-word reveal */}
           <motion.h1
             variants={itemVariants}
             className="text-5xl sm:text-6xl md:text-7xl xl:text-8xl font-semibold tracking-tight leading-[1.05] mb-6"
           >
-            {headlineLines.map((line, i) => (
-              <span key={i} className="block">
-                {i === 0 ? (
-                  <span className="text-text">{line}</span>
-                ) : (
-                  <span className="text-gradient-accent">{line}</span>
-                )}
-              </span>
-            ))}
+            {headlineLines.map((line, lineIdx) => {
+              const words = line.split(' ')
+              return (
+                <span key={lineIdx} className="block overflow-visible">
+                  {words.map((word, wordIdx) => {
+                    const globalIdx = lineIdx * 4 + wordIdx
+                    return (
+                      <motion.span
+                        key={wordIdx}
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: 0.6,
+                          delay: 0.4 + globalIdx * 0.12,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                        className={`inline-block mr-[0.25em] ${lineIdx === 0 ? 'text-text' : 'text-gradient-accent'}`}
+                      >
+                        {word}
+                      </motion.span>
+                    )
+                  })}
+                </span>
+              )
+            })}
           </motion.h1>
 
           {/* Subline */}
@@ -132,7 +175,7 @@ export default function Hero() {
             <span className="text-xs text-subtle font-mono">{meta.email}</span>
           </motion.div>
         </motion.div>
-      </div>
+      </motion.div>
 
       {/* Scroll indicator */}
       <motion.div
@@ -151,3 +194,4 @@ export default function Hero() {
     </section>
   )
 }
+

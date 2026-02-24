@@ -1,8 +1,31 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { about } from '@/lib/data'
+import WireframeShape from './WireframeShape'
+
+function CountUp({ target, suffix = '', duration = 1500 }: { target: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0)
+  const ref = useRef<HTMLSpanElement>(null)
+  const inView = useInView(ref, { once: true })
+
+  useEffect(() => {
+    if (!inView) return
+    const start = Date.now()
+    const tick = () => {
+      const elapsed = Date.now() - start
+      const progress = Math.min(elapsed / duration, 1)
+      // ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.round(eased * target))
+      if (progress < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }, [inView, target, duration])
+
+  return <span ref={ref}>{count}{suffix}</span>
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -23,7 +46,7 @@ export default function About() {
       {/* Section background accent */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-surface/20 to-background pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto section-padding">
+      <div className="relative max-w-[1440px] mx-auto section-padding">
         <motion.div
           ref={ref}
           variants={stagger}
@@ -80,23 +103,20 @@ export default function About() {
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl" />
               </div>
 
-              {/* Placeholder content */}
+              {/* Wireframe background */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-25 pointer-events-none">
+                <WireframeShape size={480} />
+              </div>
+
+              {/* Content */}
               <div className="relative z-10 flex flex-col items-center justify-center h-full p-8">
-                {/* Avatar placeholder */}
-                <div className="w-32 h-32 rounded-full bg-surface-2 border-2 border-border flex items-center justify-center mb-6">
-                  <svg
-                    className="w-16 h-16 text-subtle"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
+                {/* Headshot */}
+                <div className="w-32 h-32 rounded-full bg-surface-2 border-2 border-border overflow-hidden mb-6">
+                  <img
+                    src="/headshot.jpg"
+                    alt="Christian Nyamekye"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
 
                 <h3 className="text-lg font-semibold text-text mb-1">Christian Nyamekye</h3>
@@ -105,17 +125,23 @@ export default function About() {
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4 w-full">
                   {[
-                    { label: 'Projects', value: '17+' },
-                    { label: 'Years building', value: '4+' },
+                    { label: 'Projects', numeric: 17, suffix: '+' },
+                    { label: 'Years building', numeric: 4, suffix: '+' },
                     { label: 'Stack depth', value: 'EE → ML' },
                     { label: 'Based in', value: 'Hanover, NH' },
-                  ].map(({ label, value }) => (
+                  ].map((stat) => (
                     <div
-                      key={label}
+                      key={stat.label}
                       className="bg-background/60 rounded-xl p-3 border border-border/60"
                     >
-                      <div className="text-lg font-semibold text-text">{value}</div>
-                      <div className="text-xs text-subtle mt-0.5">{label}</div>
+                      <div className="text-lg font-semibold text-text">
+                        {'numeric' in stat ? (
+                          <CountUp target={stat.numeric} suffix={stat.suffix} />
+                        ) : (
+                          stat.value
+                        )}
+                      </div>
+                      <div className="text-xs text-subtle mt-0.5">{stat.label}</div>
                     </div>
                   ))}
                 </div>
@@ -125,7 +151,7 @@ export default function About() {
               <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-surface to-transparent" />
             </div>
 
-            {/* Floating accent card */}
+            {/* Floating accent card — currently building */}
             <motion.div
               animate={{ y: [0, -6, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -147,3 +173,4 @@ export default function About() {
     </section>
   )
 }
+

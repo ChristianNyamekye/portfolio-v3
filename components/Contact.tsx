@@ -23,7 +23,7 @@ export default function Contact() {
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent/5 rounded-full blur-3xl pointer-events-none" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto section-padding">
+      <div className="relative max-w-[1440px] mx-auto section-padding">
         <div ref={ref} className="max-w-2xl mx-auto text-center">
           {/* Label */}
           <motion.div
@@ -124,3 +124,4 @@ export default function Contact() {
     </section>
   )
 }
+

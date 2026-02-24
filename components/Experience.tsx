@@ -20,7 +20,7 @@ export default function Experience() {
 
   return (
     <section id="experience" className="relative py-32">
-      <div className="max-w-7xl mx-auto section-padding">
+      <div className="max-w-[1440px] mx-auto section-padding">
         {/* Header */}
         <div ref={ref} className="mb-16">
           <motion.div
@@ -61,7 +61,7 @@ export default function Experience() {
                 className="relative md:pl-10 group"
               >
                 {/* Timeline dot */}
-                <div className="hidden md:block absolute left-0 top-7 w-2 h-2 rounded-full bg-accent/60 ring-4 ring-background -translate-x-[3px] group-hover:bg-accent transition-colors duration-200" />
+                <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent/60 ring-4 ring-background -translate-x-[3px] group-hover:bg-accent transition-colors duration-200" />
 
                 {/* Card */}
                 <div className="
@@ -71,7 +71,13 @@ export default function Experience() {
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
                     <div>
                       <h3 className="font-semibold text-text text-lg leading-tight">
-                        {item.role}
+                        {item.role.includes('Coulter Scholar') ? (
+                          <>
+                            {item.role.split('Coulter Scholar')[0]}
+                            <a href="https://students.dartmouth.edu/surfd/scholar-programs/coulter-scholars" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-blue-400 transition-colors">Coulter Scholar</a>
+                            {item.role.split('Coulter Scholar')[1]}
+                          </>
+                        ) : item.role}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
                         {item.link ? (
@@ -112,3 +118,4 @@ export default function Experience() {
     </section>
   )
 }
+

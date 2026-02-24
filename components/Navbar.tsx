@@ -10,6 +10,7 @@ const navLinks = [
   { label: 'Experience', href: '#experience' },
   { label: 'Projects', href: '#projects' },
   { label: 'Contact', href: '#contact' },
+  { label: 'Resume', href: 'https://docs.google.com/document/d/1baFxz880bwpHy8L0S91R3N1W0Ou0C3GJbxlDbjYw9Yo/edit?tab=t.0', external: true },
 ]
 
 export default function Navbar() {
@@ -55,13 +56,15 @@ export default function Navbar() {
             : 'bg-transparent py-5'}
         `}
       >
-        <div className="max-w-7xl mx-auto section-padding flex items-center justify-between">
+        <div className="max-w-[1440px] mx-auto section-padding flex items-center justify-between">
           {/* Logo */}
           <a
             href="#"
             className="font-semibold text-text tracking-tight hover:text-accent transition-colors duration-200"
           >
+            <span className="font-mono text-accent mr-1 text-sm">{'<'}</span>
             CN
+            <span className="font-mono text-accent ml-1 text-sm">{'/>'}</span>
           </a>
 
           {/* Desktop nav */}
@@ -70,6 +73,7 @@ export default function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
+                {...('external' in link && link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                 className="text-sm text-muted hover:text-text transition-colors duration-200 relative group"
               >
                 {link.label}
@@ -172,3 +176,4 @@ export default function Navbar() {
     </>
   )
 }
+
