@@ -13,7 +13,6 @@ import Footer from '@/components/Footer'
 import AIAssistant from '@/components/AIAssistant'
 // 3D art removed to prevent flashes
 import CursorGlow from '@/components/CursorGlow'
-import CustomCursor from '@/components/CustomCursor'
 import SmoothScroll from '@/components/SmoothScroll'
 
 export default function Home() {
@@ -26,7 +25,6 @@ export default function Home() {
         <main className="relative min-h-screen bg-background">
           <SmoothScroll />
           <CursorGlow />
-          <CustomCursor />
           <Navbar />
           <Hero />
           <About />

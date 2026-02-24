@@ -19,7 +19,7 @@ export default function Experience() {
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section id="experience" className="relative py-40">
+    <section id="experience" className="relative py-32">
       <div className="max-w-[1440px] mx-auto section-padding">
         {/* Header */}
         <div ref={ref} className="mb-16">
@@ -37,7 +37,7 @@ export default function Experience() {
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.03em] text-text"
+            className="text-3xl md:text-4xl font-semibold tracking-tight text-text"
           >
             Where I've worked
           </motion.h2>

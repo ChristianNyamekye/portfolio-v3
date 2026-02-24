@@ -42,7 +42,7 @@ export default function About() {
   const inView = useInView(ref, { once: true, margin: '-100px' })
 
   return (
-    <section id="about" className="relative py-40 overflow-hidden">
+    <section id="about" className="relative py-32 overflow-hidden">
       {/* Section background accent */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-surface/20 to-background pointer-events-none" />
 
@@ -64,7 +64,7 @@ export default function About() {
 
             <motion.h2
               variants={fadeUp}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.03em] text-text mb-10"
+              className="text-3xl md:text-4xl font-semibold tracking-tight text-text mb-8"
             >
               Hardware + software +<br />
               <span className="text-gradient-accent">AI in one person.</span>

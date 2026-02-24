@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect, useCallback, type MouseEvent as ReactMouseEvent } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { ExternalLink, Github, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import { featuredProjects, notableProjects } from '@/lib/data'
@@ -216,72 +216,50 @@ function FeaturedCarousel() {
   )
 }
 
-/* ─── Notable row — huyml-style hover image reveal ────── */
-function NotableRow({ project, index }: { project: typeof notableProjects[0]; index: number }) {
-  const [hovered, setHovered] = useState(false)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const rowRef = useRef<HTMLDivElement>(null)
-
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!rowRef.current) return
-    const rect = rowRef.current.getBoundingClientRect()
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
-  }
+/* ─── Notable card (Tier 2) ────────────────────────────── */
+function NotableCard({ project, index }: { project: typeof notableProjects[0]; index: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-40px' })
 
   return (
     <motion.div
-      ref={rowRef}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay: index * 0.06 }}
-      className="group relative border-b border-border/50 last:border-b-0"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onMouseMove={onMouseMove}
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.08 }}
+      className="group card-base card-hover flex flex-col overflow-hidden h-full"
     >
-      <a
-        href={project.link || project.github || '#'}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-between py-6 md:py-8 px-2"
-      >
-        <div className="flex items-center gap-6 flex-1 min-w-0">
-          <span className="text-xs font-mono text-subtle w-8 shrink-0">
-            {String(index + 1).padStart(2, '0')}
-          </span>
-          <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold text-text group-hover:text-accent transition-colors duration-300 truncate">
-            {project.name}
-          </h3>
-          <p className="hidden md:block text-sm text-muted truncate max-w-xs">
-            {project.description}
-          </p>
-        </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="hidden sm:flex gap-2">
-            {project.tags.slice(0, 2).map((tag) => (
-              <span key={tag} className="tag-base text-[10px]">{tag}</span>
-            ))}
-          </div>
-          <ArrowUpRight size={18} className="text-muted group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
-        </div>
-      </a>
+      {/* Media */}
+      <ProjectMedia project={project} height="h-40" />
 
-      {/* Floating image on hover */}
-      {project.image && (
-        <div
-          className="absolute z-30 pointer-events-none transition-opacity duration-300 rounded-xl overflow-hidden shadow-2xl"
-          style={{
-            opacity: hovered ? 1 : 0,
-            left: mousePos.x + 20,
-            top: mousePos.y - 80,
-            width: 280,
-            height: 180,
-          }}
-        >
-          <img src={project.image} alt={project.name} className="w-full h-full object-cover" />
+      <div className="p-6 flex flex-col flex-1">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <h3 className="font-semibold text-text text-base">{project.name}</h3>
+          <div className="flex gap-1.5 shrink-0">
+            {project.github && (
+              <a href={project.github} target="_blank" rel="noopener noreferrer"
+                className="p-1.5 text-muted hover:text-text transition-colors" aria-label="GitHub">
+                <Github size={14} />
+              </a>
+            )}
+            {project.link && (
+              <a href={project.link} target="_blank" rel="noopener noreferrer"
+                className="p-1.5 text-muted hover:text-text transition-colors" aria-label="Live">
+                <ArrowUpRight size={14} />
+              </a>
+            )}
+          </div>
         </div>
-      )}
+
+        <p className="text-muted text-sm leading-relaxed flex-1 mb-4">{project.description}</p>
+
+        <div className="flex flex-wrap gap-1.5 mt-auto">
+          {project.tags.map((tag) => (
+            <span key={tag} className="tag-base text-[11px]">{tag}</span>
+          ))}
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -292,7 +270,7 @@ export default function Projects() {
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' })
 
   return (
-    <section id="projects" className="relative py-40">
+    <section id="projects" className="relative py-32">
       <div className="absolute inset-0 bg-gradient-to-b from-background via-surface/10 to-background pointer-events-none" />
 
       <div className="relative max-w-[1440px] mx-auto section-padding">
@@ -314,7 +292,7 @@ export default function Projects() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.03em] text-text">
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-text">
               Things I&apos;ve built
             </h2>
           </motion.div>
@@ -338,9 +316,9 @@ export default function Projects() {
             <div className="flex-1 h-px bg-border" />
           </motion.div>
 
-          <div className="border-t border-border/50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {notableProjects.map((project, i) => (
-              <NotableRow key={project.name} project={project} index={i} />
+              <NotableCard key={project.name} project={project} index={i} />
             ))}
           </div>
         </div>

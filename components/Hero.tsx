@@ -82,10 +82,10 @@ export default function Hero() {
             )}
           </motion.div>
 
-          {/* Headline — massive editorial reveal */}
+          {/* Headline — word-by-word reveal */}
           <motion.h1
             variants={itemVariants}
-            className="text-6xl sm:text-7xl md:text-8xl lg:text-[110px] xl:text-[130px] font-bold tracking-[-0.04em] leading-[0.95] mb-8"
+            className="text-5xl sm:text-6xl md:text-7xl xl:text-8xl font-semibold tracking-tight leading-[1.05] mb-6"
           >
             {headlineLines.map((line, lineIdx) => {
               const words = line.split(' ')

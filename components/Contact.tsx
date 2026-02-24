@@ -17,7 +17,7 @@ export default function Contact() {
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section id="contact" className="relative py-40 overflow-hidden">
+    <section id="contact" className="relative py-32 overflow-hidden">
       {/* BG accent */}
       <div className="absolute inset-0">
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent/5 rounded-full blur-3xl pointer-events-none" />
