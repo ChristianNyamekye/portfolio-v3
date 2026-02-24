@@ -137,11 +137,11 @@ export const featuredProjects: FeaturedProject[] = [
   },
   {
     id: 'spot',
-    name: 'Spot Voice Control',
-    tagline: 'Boston Dynamics Spot, controlled by voice',
+    name: 'Autonomous Spot Platform',
+    tagline: 'Extending Boston Dynamics Spot with voice, autonomy, and custom hardware',
     description:
-      'Voice-commanding a quadruped robot via Jetson Nano: VAD → ASR → intent parsing → Spot SDK dispatch in under 400ms. Natural-language interfaces for legged robotics.',
-    tags: ['Python', 'Jetson Nano', 'VAD', 'ASR', 'Spot SDK', 'Edge ML'],
+      'Multi-semester research platform built on Boston Dynamics Spot. Developed voice-controlled operation (VAD → ASR → intent → SDK dispatch in <400ms), autonomous navigation, person-following via perception pipelines, and custom payload design in SolidWorks. Full-stack robotics — from CAD and MuJoCo simulation to real-time edge inference on Jetson Nano.',
+    tags: ['Python', 'Spot SDK', 'Jetson Nano', 'SolidWorks', 'MuJoCo', 'Edge ML', 'Autonomy'],
     status: 'Complete',
     github: 'https://github.com/ChristianNyamekye/spot-voice-control',
   },
