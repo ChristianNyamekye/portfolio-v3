@@ -137,8 +137,8 @@ export const featuredProjects: FeaturedProject[] = [
   },
   {
     id: 'spot',
-    name: 'Autonomous Spot Platform',
-    tagline: 'Extending Boston Dynamics Spot with voice, autonomy, and custom hardware',
+    name: 'Spot Autonomy Stack',
+    tagline: 'Voice control, autonomous navigation, and perception on Boston Dynamics Spot',
     description:
       'Research platform built on Boston Dynamics Spot. Developed voice-controlled operation (VAD → ASR → intent → SDK dispatch in <400ms), autonomous navigation, person-following via perception pipelines, and custom payload design in SolidWorks. Full-stack robotics — from CAD and MuJoCo simulation to real-time edge inference on Jetson Nano.',
     tags: ['Python', 'Spot SDK', 'Jetson Nano', 'SolidWorks', 'MuJoCo', 'Edge ML', 'Autonomy'],
@@ -276,5 +276,6 @@ export const otherProjects: OtherProject[] = [
     description:
       'Embedded systems maze-solving robot with procedural generation, multi-algorithm pathfinding (BFS, DFS, A*), and real-time visualization.',
     tags: ['Embedded C', 'Algorithms', 'Robotics', 'Sensors'],
+    video: asset('/maze.mp4'),
   },
 ]
