@@ -114,14 +114,14 @@ export interface FeaturedProject {
 
 export const featuredProjects: FeaturedProject[] = [
   {
-    id: 'dexcrowd',
-    name: 'DexCrowd',
+    id: 'egocrowd',
+    name: 'EgoCrowd',
     tagline: 'Crowdsourced manipulation data for humanoid robots',
     description:
-      'The economics of robotics training data are broken - motion capture rigs cost $8,700+. DexCrowd rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
+      'The economics of robotics training data are broken - motion capture rigs cost $8,700+. EgoCrowd rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
     tags: ['Swift', 'CoreML', 'Next.js', 'Python', 'Computer Vision', 'Robotics'],
     status: 'Active',
-    video: asset('/egodex-demo.mov'),
+    video: asset('/egocrowd-demo.mp4'),
     github: 'https://github.com/ChristianNyamekye/egodex',
   },
   {
@@ -184,8 +184,8 @@ export const notableProjects: NotableProject[] = [
   {
     name: 'Payment Transactions',
     description:
-      'Transaction processing backend with ACID guarantees, idempotency keys, and concurrent write safety under failure conditions.',
-    tags: ['TypeScript', 'Node.js', 'SQL', 'Concurrency', 'Backend'],
+      'On-chain payment pipeline enabling instant mobile money transfers within and across African countries. Built with ACID guarantees, idempotency keys, and concurrent write safety.',
+    tags: ['TypeScript', 'Node.js', 'Blockchain', 'Mobile Money', 'Backend'],
     video: asset('/payment-system.mp4'),
     github: 'https://github.com/ChristianNyamekye/transfer-backend',
   },
