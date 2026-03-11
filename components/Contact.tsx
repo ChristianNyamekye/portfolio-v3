@@ -2,103 +2,97 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { Mail, Github, Linkedin, Twitter, Instagram, ArrowUpRight } from 'lucide-react'
+import { Mail, Github, Linkedin, Twitter, ArrowUpRight } from 'lucide-react'
 import { meta } from '@/lib/data'
 
+const ease = [0.22, 1, 0.36, 1] as const
+
 const socials = [
-  { icon: Github, href: meta.social.github, label: 'GitHub', handle: '@ChristianNyamekye' },
-  { icon: Linkedin, href: meta.social.linkedin, label: 'LinkedIn', handle: 'christian-k-nyamekye' },
-  { icon: Twitter, href: meta.social.twitter, label: 'X / Twitter', handle: '@printlnxristian' },
-  { icon: Instagram, href: meta.social.instagram, label: 'Instagram', handle: 'christiannyamekye.kjr' },
+  { icon: Github,   href: meta.social.github,   label: 'GitHub',   handle: '@ChristianNyamekye' },
+  { icon: Linkedin, href: meta.social.linkedin,  label: 'LinkedIn', handle: 'christian-k-nyamekye' },
+  { icon: Twitter,  href: meta.social.twitter,   label: 'X',        handle: '@printlnxristian' },
 ]
 
 export default function Contact() {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref    = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section id="contact" className="relative py-32 overflow-hidden">
-      {/* BG accent */}
-      <div className="absolute inset-0">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-      </div>
+    <section id="contact" className="relative py-28 md:py-40">
+      <div className="max-w-[1400px] mx-auto section-padding">
+        <div ref={ref}>
 
-      <div className="relative max-w-[1440px] mx-auto section-padding">
-        <div ref={ref} className="max-w-2xl mx-auto text-center">
-          {/* Label */}
+          {/* Section label */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="mb-4"
+            transition={{ duration: 0.6, ease }}
+            className="mb-8"
           >
-            <span className="text-xs font-mono text-accent tracking-widest uppercase">
-              004 / Contact
+            <span className="text-xs font-mono text-accent tracking-[0.18em] uppercase">
+              04 / Contact
             </span>
           </motion.div>
 
-          {/* Headline */}
+          {/* Heading — large, editorial */}
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 28 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.08 }}
-            className="text-4xl md:text-5xl font-semibold tracking-tight text-text mb-6"
+            transition={{ duration: 0.8, ease, delay: 0.08 }}
+            className="text-display font-semibold text-text mb-6"
+            style={{ fontSize: 'clamp(2.5rem, 7vw, 6rem)', lineHeight: 1.0 }}
           >
-            Let's build something
-            <br />
-            <span className="text-gradient-accent">together.</span>
+            Let's talk.
           </motion.h2>
 
-          {/* Body */}
+          {/* Sub-copy */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="text-muted text-lg leading-relaxed mb-12"
+            transition={{ duration: 0.7, ease, delay: 0.16 }}
+            className="text-muted text-lg md:text-xl leading-relaxed max-w-xl mb-12"
           >
-            Whether it's robotics, a hard engineering problem, or building something from zero — my inbox is open.
+            Robotics, hard engineering problems, or building something from zero — my inbox is open.
           </motion.p>
 
-          {/* CTA */}
+          {/* Email CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.22 }}
+            transition={{ duration: 0.6, ease, delay: 0.24 }}
             className="mb-16"
           >
             <a
               href={`mailto:${meta.email}`}
-              className="
-                group inline-flex items-center gap-3 px-8 py-4 rounded-2xl
-                bg-surface border border-border
-                hover:border-accent/50 hover:bg-surface-2
-                transition-all duration-300
-                text-text font-medium
-              "
+              className="group inline-flex items-center gap-3 text-text hover:text-accent transition-colors duration-200"
             >
-              <Mail size={18} className="text-accent" />
-              {meta.email}
+              <span
+                className="text-display font-medium"
+                style={{ fontSize: 'clamp(1rem, 2.5vw, 1.5rem)' }}
+              >
+                {meta.email}
+              </span>
               <ArrowUpRight
-                size={16}
-                className="text-muted group-hover:text-text group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"
+                size={22}
+                className="text-muted group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200"
               />
             </a>
           </motion.div>
 
-          {/* Divider */}
+          {/* Rule */}
           <motion.div
             initial={{ opacity: 0, scaleX: 0 }}
             animate={inView ? { opacity: 1, scaleX: 1 } : {}}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="gradient-line mb-12"
+            transition={{ duration: 0.8, ease, delay: 0.32 }}
+            className="origin-left rule-gradient mb-12 max-w-md"
           />
 
           {/* Social links */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.38 }}
-            className="flex flex-wrap justify-center gap-4"
+            transition={{ duration: 0.6, ease, delay: 0.4 }}
+            className="flex flex-wrap gap-3"
           >
             {socials.map(({ icon: Icon, href, label, handle }) => (
               <a
@@ -106,22 +100,17 @@ export default function Contact() {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="
-                  group flex items-center gap-2.5 px-4 py-2.5 rounded-xl
-                  border border-border text-muted text-sm
-                  hover:border-border-bright hover:text-text hover:bg-surface-2
-                  transition-all duration-200
-                "
                 aria-label={label}
+                className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-border text-muted text-sm hover:border-border-bright hover:text-text hover:bg-surface transition-all duration-200"
               >
-                <Icon size={15} className="group-hover:text-accent transition-colors duration-200" />
+                <Icon size={14} className="group-hover:text-accent transition-colors duration-200" />
                 <span className="font-mono text-xs">{handle}</span>
               </a>
             ))}
           </motion.div>
+
         </div>
       </div>
     </section>
   )
 }
-

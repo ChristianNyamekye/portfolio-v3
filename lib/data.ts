@@ -5,7 +5,7 @@
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || ''
 /** Prefix local assets with basePath for GH Pages compatibility */
-const asset = (path: string) => `${BASE}${path}`
+export const asset = (path: string) => `${BASE}${path}`
 
 export const meta = {
   name: 'Christian Nyamekye',
@@ -23,7 +23,7 @@ export const meta = {
 }
 
 export const hero = {
-  eyebrow: 'Developer | Coulter Scholar',
+  eyebrow: 'Engineer & Builder',
   eyebrowLink: 'https://students.dartmouth.edu/surfd/scholar-programs/coulter-scholars',
   headline: 'Engineering what\ncomes next.',
   subline:
@@ -114,36 +114,37 @@ export interface FeaturedProject {
 
 export const featuredProjects: FeaturedProject[] = [
   {
-    id: 'egocrowd',
-    name: 'EgoCrowd',
+    id: 'flexa',
+    name: 'flexa',
     tagline: 'Crowdsourced manipulation data for humanoid robots',
     description:
-      'The economics of robotics training data are broken - motion capture rigs cost $8,700+. EgoCrowd rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
+      'The economics of robotics training data are broken - motion capture rigs cost $8,700+. Flexa rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.',
     tags: ['Swift', 'CoreML', 'Next.js', 'Python', 'Computer Vision', 'Robotics'],
     status: 'Active',
-    video: asset('/egocrowd-demo.mp4'),
-    github: 'https://github.com/ChristianNyamekye/egodex',
+    video: asset('/flexa-demo.mp4'),
+    github: 'https://github.com/orgs/flexa-tech/repositories',
   },
   {
     id: 'garb',
-    name: 'GARB',
+    name: 'garb',
     tagline: 'Gaze-Aware Reading Aid for the Browser',
     description:
       'Uses Tobii eye-tracking to build a real-time gaze model that adapts the reading environment - dynamic line highlighting, distraction removal, and comprehension nudges. Full service architecture with a user study in design.',
     tags: ['TypeScript', 'Chrome Extension APIs', 'Tobii SDK', 'Python', 'Accessibility'],
     video: asset('/garb.mp4'),
     status: 'Development',
-    github: 'https://github.com/ChristianNyamekye/garb-2024',
+    github: 'https://github.com/garb-browser',
   },
   {
-    id: 'spot',
-    name: 'Spot Autonomy Stack',
-    tagline: 'Voice control, autonomous navigation, and perception on Boston Dynamics Spot',
+    id: 'quadsense',
+    name: 'quadsense',
+    tagline: 'Voice-controlled autonomy platform for Boston Dynamics Spot',
     description:
-      'Research platform built on Boston Dynamics Spot. Developed voice-controlled operation (VAD → ASR → intent → SDK dispatch in <400ms), autonomous navigation, person-following via perception pipelines, and custom payload design in SolidWorks. Full-stack robotics — from CAD and MuJoCo simulation to real-time edge inference on Jetson Nano.',
-    tags: ['Python', 'Spot SDK', 'Jetson Nano', 'SolidWorks', 'MuJoCo', 'Edge ML', 'Autonomy'],
+      'Voice-controlled autonomy platform for Boston Dynamics Spot, built on an NVIDIA Jetson AGX Orin 64GB payload. Real-time speech pipeline — WebRTC VAD and custom wake-word detection into NVIDIA Riva ASR (Canary-Qwen-2.5B), interpreted by a locally-hosted Qwen 2.5 7B LLM that maps natural language to Spot SDK motor commands, with Kokoro TTS for spoken feedback. Includes a mobile web control panel for remote E-Stop, YOLOv8-based door detection with autonomous traversal, and GraphNav-powered waypoint navigation.',
+    tags: ['Python', 'Spot SDK', 'Jetson AGX Orin', 'NVIDIA Riva', 'YOLOv8', 'LLM', 'GraphNav', 'Autonomy'],
+    video: asset('/quadsense.mp4'),
     status: 'Complete',
-    github: 'https://github.com/ChristianNyamekye/spot-voice-control',
+    github: 'https://github.com/ChristianNyamekye/dartmouth_spot_capstone',
   },
 ]
 
@@ -172,6 +173,7 @@ export const notableProjects: NotableProject[] = [
       'Email list management system with subscription/unsubscribe flows, bounce handling, and scheduled digest delivery.',
     tags: ['Python', 'SMTP', 'Email', 'Systems'],
     link: 'https://listservcal.tech',
+    github: 'https://github.com/CS98-F25-W26/project-we-run-the-school',
     image: asset('/listserv.png'),
   },
   {
@@ -188,6 +190,7 @@ export const notableProjects: NotableProject[] = [
     tags: ['TypeScript', 'Node.js', 'Blockchain', 'Mobile Money', 'Backend'],
     video: asset('/payment-system.mp4'),
     github: 'https://github.com/ChristianNyamekye/transfer-backend',
+    link: 'https://useflexa.lovable.app/',
   },
   {
     name: 'EchecsAI',
@@ -197,6 +200,13 @@ export const notableProjects: NotableProject[] = [
     image: asset('/echecsai.png'),
     link: 'https://echecsai.vercel.app',
     github: 'https://github.com/ChristianNyamekye/EchecsAI',
+  },
+  {
+    name: 'Magnetic Levitation',
+    description:
+      'Control theory project: electromagnetic levitation system using PID feedback control, real-time sensor reading, and PWM-driven coil actuation to suspend objects in mid-air.',
+    tags: ['Control Theory', 'PID', 'Electromagnetics', 'Embedded Systems'],
+    image: asset('/maglev.jpg'),
   },
   {
     name: 'Biblio',

@@ -91,15 +91,15 @@ LinkedIn: https://linkedin.com/in/christian-k-nyamekye
 
 ── FEATURED PROJECTS ──
 
-1. EgoCrowd (Active)
-   Crowdsourced manipulation data for humanoid robots. The economics of robotics training data are broken — motion capture rigs cost $8,700+. EgoCrowd rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.
+1. Flexa (Active)
+   Crowdsourced manipulation data for humanoid robots. The economics of robotics training data are broken — motion capture rigs cost $8,700+. Flexa rebuilds the pipeline with an iPhone + Apple Watch for $950, then syndicates structured training sets to robotics labs.
    Stack: Swift, CoreML, Next.js, Python, Computer Vision, Robotics.
-   GitHub: https://github.com/ChristianNyamekye/egodex
+   GitHub: https://github.com/orgs/flexa-tech/repositories
 
 2. GARB — Gaze-Aware Reading Aid for the Browser (Development)
    Uses Tobii eye-tracking to build a real-time gaze model that adapts the reading environment — dynamic line highlighting, distraction removal, and comprehension nudges. Full service architecture with a user study in design.
    Stack: TypeScript, Chrome Extension APIs, Tobii SDK, Python, Accessibility.
-   GitHub: https://github.com/ChristianNyamekye/garb-2024
+   GitHub: https://github.com/garb-browser
 
 3. EchecsAI (Live)
    Browser extension bringing Stockfish analysis to chess.com and lichess with human-readable explanations. Runs on GCP Functions behind a Vercel frontend.
@@ -107,10 +107,10 @@ LinkedIn: https://linkedin.com/in/christian-k-nyamekye
    Live: https://echecsai.vercel.app
    GitHub: https://github.com/ChristianNyamekye/EchecsAI
 
-4. Spot Voice Control (Complete)
-   Voice-commanding a Boston Dynamics Spot quadruped robot via Jetson Nano. Pipeline: VAD → ASR → intent parsing → Spot SDK dispatch in under 400ms. Natural-language interfaces for legged robotics.
-   Stack: Python, Jetson Nano, VAD, ASR, Spot SDK, Edge ML.
-   GitHub: https://github.com/ChristianNyamekye/spot-voice-control
+4. QuadSense (Complete)
+   Multimodal robotics interface for quadruped navigation and control. Built on Boston Dynamics Spot — voice-controlled operation (VAD → ASR → intent → SDK dispatch in <400ms), autonomous navigation, person-following, custom payload design in SolidWorks, MuJoCo simulation, edge inference on Jetson Nano.
+   Stack: Python, Jetson Nano, VAD, ASR, Spot SDK, Edge ML, SolidWorks, MuJoCo.
+   GitHub: https://github.com/ChristianNyamekye/dartmouth_spot_capstone
 
 ── NOTABLE PROJECTS ──
 
@@ -137,7 +137,7 @@ Frameworks: React, Next.js, Node.js, Express, Flask
 Hardware: PCB design, embedded C, Arduino, Jetson Nano, FPGA basics
 ML/AI: CoreML, computer vision, NLP, edge ML
 Cloud: GCP, Vercel, AWS basics
-Tools: VS Code Extensions, Chrome Extension APIs, Spot SDK, Qiskit, Tobii SDK`
+Tools: VS Code Extensions, Chrome Extension APIs, Spot SDK (QuadSense), Qiskit, Tobii SDK`
 
 // ─── Route handler ─────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {

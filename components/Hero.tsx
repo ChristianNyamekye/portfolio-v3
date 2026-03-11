@@ -1,160 +1,115 @@
 'use client'
 
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
-import { ArrowDown, Github, Linkedin, Twitter, Instagram } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Github, Linkedin, Twitter, Instagram, ArrowRight } from 'lucide-react'
 import { hero, meta } from '@/lib/data'
-import ParticleCanvas from './ParticleCanvas'
-import { HeroArt } from './ArtScene'
 
 const socials = [
-  { icon: Github, href: meta.social.github, label: 'GitHub' },
-  { icon: Linkedin, href: meta.social.linkedin, label: 'LinkedIn' },
-  { icon: Twitter, href: meta.social.twitter, label: 'X / Twitter' },
-  { icon: Instagram, href: meta.social.instagram, label: 'Instagram' },
+  { icon: Github,    href: meta.social.github,    label: 'GitHub' },
+  { icon: Linkedin,  href: meta.social.linkedin,   label: 'LinkedIn' },
+  { icon: Twitter,   href: meta.social.twitter,    label: 'X / Twitter' },
+  { icon: Instagram, href: meta.social.instagram,  label: 'Instagram' },
 ]
 
-const containerVariants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.12, delayChildren: 0.2 } },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
-}
+const ease = [0.22, 1, 0.36, 1] as const
 
 export default function Hero() {
-  const headlineLines = hero.headline.split('\n')
-  const sectionRef = useRef<HTMLElement>(null)
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 80])
-  const particleY = useTransform(scrollYProgress, [0, 1], [0, 150])
-
   return (
     <section
-      ref={sectionRef}
       id="hero"
-      className="relative min-h-screen flex flex-col justify-center overflow-hidden grid-bg"
+      className="relative min-h-screen flex flex-col justify-center overflow-hidden"
     >
-      {/* Particle constellation background */}
-      <motion.div style={{ y: particleY }} className="absolute inset-0">
-        <ParticleCanvas />
-      </motion.div>
+      {/* Subtle vignette at bottom — blends into next section */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background to-transparent z-10"
+      />
 
-      {/* Animated orbs */}
-      <div className="mesh-bg">
-        <div className="mesh-orb mesh-orb-1" />
-        <div className="mesh-orb mesh-orb-2" />
-        <div className="mesh-orb mesh-orb-3" />
-      </div>
+      {/* Very subtle accent glow — top-right corner, faint */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full opacity-[0.04]"
+        style={{ background: 'radial-gradient(circle, #3b82f6, transparent 70%)' }}
+      />
 
-      {/* 3D Art — right side */}
-      <HeroArt />
-
-      {/* Vignette bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-
-      {/* Content */}
-      <motion.div style={{ y: contentY }} className="relative z-10 max-w-[1440px] mx-auto section-padding w-full pt-28 pb-20">
+      {/* ── Content ─────────────────────────────────────────── */}
+      <div className="relative z-10 max-w-[1400px] mx-auto section-padding w-full pt-36 pb-24">
         <motion.div
-          variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="max-w-4xl"
+          variants={{ show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } } }}
+          className="max-w-5xl"
         >
-          {/* Eyebrow */}
-          <motion.div variants={itemVariants} className="flex items-center gap-3 mb-8">
+
+          {/* Eyebrow — role indicator with live dot */}
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } } }}
+            className="flex items-center gap-2.5 mb-10"
+          >
             <div className="status-dot-active" />
-            {hero.eyebrowLink ? (
-              <a
-                href={hero.eyebrowLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-mono text-muted tracking-widest uppercase hover:text-accent transition-colors duration-200"
-              >
-                {hero.eyebrow}
-              </a>
-            ) : (
-              <span className="text-sm font-mono text-muted tracking-widest uppercase">
-                {hero.eyebrow}
-              </span>
-            )}
+            <a
+              href={hero.eyebrowLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-mono text-muted tracking-[0.18em] uppercase hover:text-accent transition-colors duration-200"
+            >
+              {hero.eyebrow}
+            </a>
           </motion.div>
 
-          {/* Headline — word-by-word reveal */}
+          {/* Name — editorial serif display */}
           <motion.h1
-            variants={itemVariants}
-            className="text-5xl sm:text-6xl md:text-7xl xl:text-8xl font-semibold tracking-tight leading-[1.05] mb-6"
+            variants={{ hidden: { opacity: 0, y: 32 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease } } }}
+            className="text-display font-semibold mb-6"
+            style={{ fontSize: 'clamp(3.5rem, 9vw, 8.5rem)', lineHeight: 1.0, letterSpacing: '-0.03em' }}
           >
-            {headlineLines.map((line, lineIdx) => {
-              const words = line.split(' ')
-              return (
-                <span key={lineIdx} className="block overflow-visible">
-                  {words.map((word, wordIdx) => {
-                    const globalIdx = lineIdx * 4 + wordIdx
-                    return (
-                      <motion.span
-                        key={wordIdx}
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.6,
-                          delay: 0.4 + globalIdx * 0.12,
-                          ease: [0.22, 1, 0.36, 1],
-                        }}
-                        className={`inline-block mr-[0.25em] ${lineIdx === 0 ? 'text-text' : 'text-gradient-accent'}`}
-                      >
-                        {word}
-                      </motion.span>
-                    )
-                  })}
-                </span>
-              )
-            })}
+            <span className="block text-text">Christian</span>
+            <span className="block text-display-italic" style={{ color: 'var(--text-dim)' }}>
+              Nyamekye.
+            </span>
           </motion.h1>
 
-          {/* Subline */}
+          {/* Headline — secondary display line */}
           <motion.p
-            variants={itemVariants}
-            className="text-lg md:text-xl text-muted leading-relaxed max-w-2xl mb-10"
+            variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease } } }}
+            className="text-xl md:text-2xl font-light text-muted mb-5 max-w-2xl leading-relaxed"
+            style={{ letterSpacing: '-0.01em' }}
           >
             {hero.subline}
           </motion.p>
 
+          {/* Rule */}
+          <motion.div
+            variants={{ hidden: { opacity: 0, scaleX: 0 }, show: { opacity: 1, scaleX: 1, transition: { duration: 0.7, ease } } }}
+            className="origin-left rule-gradient mb-10 max-w-sm"
+          />
+
           {/* CTAs */}
-          <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-4 mb-16">
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } } }}
+            className="flex flex-wrap items-center gap-3 mb-14"
+          >
             <a
               href={hero.cta.href}
-              className="
-                group inline-flex items-center gap-2 px-6 py-3 rounded-xl
-                bg-accent text-white font-medium text-sm
-                hover:bg-accent-dim transition-all duration-200
-                shadow-lg shadow-accent/20
-              "
+              className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-white text-sm font-medium transition-all duration-200 hover:bg-accent-dim shadow-lg shadow-accent/20"
             >
               {hero.cta.label}
-              <svg
-                className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-0.5" />
             </a>
+
             <a
               href={hero.ctaSecondary.href}
-              className="
-                inline-flex items-center gap-2 px-6 py-3 rounded-xl
-                border border-border text-text-dim font-medium text-sm
-                hover:border-border-bright hover:text-text transition-all duration-200
-              "
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border text-text-dim text-sm font-medium transition-all duration-200 hover:border-border-bright hover:text-text"
             >
               {hero.ctaSecondary.label}
             </a>
           </motion.div>
 
-          {/* Social links */}
-          <motion.div variants={itemVariants} className="flex items-center gap-2">
+          {/* Social row */}
+          <motion.div
+            variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.6, ease } } }}
+            className="flex items-center gap-1"
+          >
             {socials.map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
@@ -162,36 +117,34 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="
-                  p-2.5 rounded-lg text-subtle hover:text-text
-                  hover:bg-surface-2 border border-transparent hover:border-border
-                  transition-all duration-200
-                "
+                className="p-2.5 rounded-lg text-subtle hover:text-text hover:bg-surface-2 border border-transparent hover:border-border transition-all duration-200"
               >
-                <Icon size={18} />
+                <Icon size={17} />
               </a>
             ))}
-            <div className="ml-4 h-px w-16 bg-border" />
-            <span className="text-xs text-subtle font-mono">{meta.email}</span>
-          </motion.div>
-        </motion.div>
-      </motion.div>
 
-      {/* Scroll indicator */}
+            <div className="mx-4 h-px w-12 bg-border" />
+            <span className="text-xs font-mono text-subtle select-all">{meta.email}</span>
+          </motion.div>
+
+        </motion.div>
+      </div>
+
+      {/* Scroll nudge */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 0.6 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        transition={{ delay: 2.2, duration: 0.6 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5"
       >
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          animate={{ y: [0, 7, 0] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-4 h-7 rounded-full border border-subtle flex justify-center pt-1.5"
         >
-          <ArrowDown size={16} className="text-subtle" />
+          <div className="w-0.5 h-2 rounded-full bg-subtle" />
         </motion.div>
       </motion.div>
     </section>
   )
 }
-

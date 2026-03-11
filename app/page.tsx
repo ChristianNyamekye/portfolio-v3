@@ -1,43 +1,41 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Loader from '@/components/Loader'
-import Navbar from '@/components/Navbar'
-import Hero from '@/components/Hero'
-import About from '@/components/About'
-import Experience from '@/components/Experience'
-import Projects from '@/components/Projects'
-import OtherProjects from '@/components/OtherProjects'
-import Contact from '@/components/Contact'
-import Footer from '@/components/Footer'
+import Portfolio from '@/components/Portfolio'
 import AIAssistant from '@/components/AIAssistant'
-// 3D art removed to prevent flashes
-import CursorGlow from '@/components/CursorGlow'
 import SmoothScroll from '@/components/SmoothScroll'
 
 export default function Home() {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    // Only show loader on first visit per session
+    const hasLoaded = sessionStorage.getItem('portfolio-loaded')
+    if (hasLoaded) {
+      setReady(true)
+    } else {
+      setLoading(true)
+    }
+  }, [])
+
+  const handleLoaderComplete = () => {
+    sessionStorage.setItem('portfolio-loaded', '1')
+    setLoading(false)
+    setReady(true)
+  }
 
   return (
     <>
-      {loading && <Loader onComplete={() => setLoading(false)} />}
-      {!loading && (
-        <main className="relative min-h-screen bg-background">
+      {loading && <Loader onComplete={handleLoaderComplete} />}
+      {ready && (
+        <main className="relative min-h-screen bg-[var(--background)]">
           <SmoothScroll />
-          <CursorGlow />
-          <Navbar />
-          <Hero />
-          <About />
-          <div className="gradient-line mx-auto max-w-[1440px] section-padding" />
-          <Experience />
-          <Projects />
-          <OtherProjects />
-          <Contact />
-          <Footer />
+          <Portfolio />
           <AIAssistant />
         </main>
       )}
     </>
   )
 }
-

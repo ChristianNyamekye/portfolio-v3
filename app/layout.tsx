@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   keywords: [
     'Christian Nyamekye',
     'robotics data',
-    'EgoCrowd',
+    'Flexa',
     'Dartmouth EE CS',
     'software engineer',
     'machine learning',
@@ -27,10 +27,10 @@ export const metadata: Metadata = {
     siteName: 'Christian Nyamekye',
     images: [
       {
-        url: `${meta.url}/og.png`,
+        url: `${meta.url}/og`,
         width: 1200,
         height: 630,
-        alt: 'Christian Nyamekye — Building the future of robotics data',
+        alt: 'Christian Nyamekye — Engineer & Builder',
       },
     ],
   },
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     title: meta.title,
     description: meta.description,
     creator: '@printlnxristian',
-    images: [`${meta.url}/og.png`],
+    images: [`${meta.url}/og`],
   },
   robots: {
     index: true,
@@ -70,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: 'Christian Nyamekye',
               url: 'https://christiannyamekye.com',
               jobTitle: 'Software Engineer & Founder',
-              description: 'Dartmouth EE+CS. Building EgoCrowd — crowdsourced manipulation training data for humanoid robots.',
+              description: 'Dartmouth EE+CS. Building Flexa — crowdsourced manipulation training data for humanoid robots.',
               alumniOf: {
                 '@type': 'CollegeOrUniversity',
                 name: 'Dartmouth College',
@@ -84,14 +84,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
-        {/* Theme flash prevention */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{const t=localStorage.getItem('theme');if(t==='light'||(!t&&window.matchMedia('(prefers-color-scheme:light)').matches))document.documentElement.classList.add('light')}catch(e){}`,
-          }}
-        />
       </head>
-      <body className="noise-overlay">
+      <body>
         {children}
         {/* Chatbot placeholder — mount a widget here */}
         <div id="chatbot-root" aria-hidden="true" />

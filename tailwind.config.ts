@@ -12,20 +12,15 @@ const config: Config = {
       colors: {
         background: 'var(--background)',
         surface: 'var(--surface)',
-        'surface-2': 'var(--surface-2)',
         border: 'var(--border)',
-        'border-bright': 'var(--border-bright)',
         accent: 'var(--accent)',
-        'accent-dim': 'var(--accent-dim)',
-        'accent-glow': 'var(--accent-glow)',
         muted: 'var(--muted)',
-        subtle: 'var(--subtle)',
         text: 'var(--text)',
-        'text-dim': 'var(--text-dim)',
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        serif: ['Playfair Display', 'Georgia', 'serif'],
       },
       animation: {
         'gradient-shift': 'gradient-shift 8s ease infinite',

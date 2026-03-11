@@ -2,120 +2,117 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { ExternalLink } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { experience } from '@/lib/data'
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: i * 0.1 },
-  }),
-}
+const ease = [0.22, 1, 0.36, 1] as const
 
 export default function Experience() {
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const headerRef = useRef<HTMLDivElement>(null)
+  const listRef   = useRef<HTMLDivElement>(null)
+  const headerInView = useInView(headerRef, { once: true, margin: '-80px' })
+  const listInView   = useInView(listRef,   { once: true, margin: '-60px' })
 
   return (
-    <section id="experience" className="relative py-32">
-      <div className="max-w-[1440px] mx-auto section-padding">
-        {/* Header */}
-        <div ref={ref} className="mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="mb-3"
-          >
-            <span className="text-xs font-mono text-accent tracking-widest uppercase">
-              002 / Experience
-            </span>
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-3xl md:text-4xl font-semibold tracking-tight text-text"
-          >
-            Where I've worked
-          </motion.h2>
-        </div>
+    <section id="experience" className="relative py-28 md:py-36">
+      <div className="max-w-[1400px] mx-auto section-padding">
 
-        {/* Timeline */}
-        <div className="relative max-w-3xl">
-          {/* Vertical line */}
-          <div className="hidden md:block absolute left-0 top-0 bottom-0">
-            <div className="timeline-line" />
-          </div>
+        {/* Label */}
+        <motion.div
+          ref={headerRef}
+          initial={{ opacity: 0, y: 16 }}
+          animate={headerInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease }}
+          className="mb-4"
+        >
+          <span className="text-xs font-mono text-accent tracking-[0.18em] uppercase">
+            02 / Experience
+          </span>
+        </motion.div>
 
-          <div className="space-y-0">
-            {experience.map((item, i) => (
-              <motion.div
-                key={`${item.org}-${i}`}
-                custom={i}
-                variants={fadeUp}
-                initial="hidden"
-                animate={inView ? 'show' : 'hidden'}
-                className="relative md:pl-10 group"
-              >
-                {/* Timeline dot */}
-                <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent/60 ring-4 ring-background -translate-x-[3px] group-hover:bg-accent transition-colors duration-200" />
+        {/* Section heading */}
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={headerInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, ease, delay: 0.08 }}
+          className="text-display font-semibold text-text mb-16"
+          style={{ fontSize: 'clamp(1.75rem, 3.5vw, 3rem)' }}
+        >
+          Where I've worked
+        </motion.h2>
 
-                {/* Card */}
-                <div className="
-                  border-b border-border/50 py-8
-                  group-hover:border-border-bright transition-colors duration-300
-                ">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
-                    <div>
-                      <h3 className="font-semibold text-text text-lg leading-tight">
-                        {item.role.includes('Coulter Scholar') ? (
-                          <>
-                            {item.role.split('Coulter Scholar')[0]}
-                            <a href="https://students.dartmouth.edu/surfd/scholar-programs/coulter-scholars" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-blue-400 transition-colors">Coulter Scholar</a>
-                            {item.role.split('Coulter Scholar')[1]}
-                          </>
-                        ) : item.role}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        {item.link ? (
-                          <a
-                            href={item.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-accent hover:text-blue-400 transition-colors text-sm font-medium inline-flex items-center gap-1"
-                          >
-                            {item.org}
-                            <ExternalLink size={11} />
-                          </a>
-                        ) : (
-                          <span className="text-accent text-sm font-medium">{item.org}</span>
-                        )}
-                      </div>
-                    </div>
-                    <span className="text-xs font-mono text-subtle whitespace-nowrap pt-1">
-                      {item.period}
-                    </span>
-                  </div>
+        {/* Experience list */}
+        <div ref={listRef} className="max-w-3xl space-y-0 divide-y divide-border">
+          {experience.map((item, i) => (
+            <motion.div
+              key={`${item.org}-${i}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={listInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, ease, delay: i * 0.08 }}
+              className="group py-8 first:pt-0 last:pb-0"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 mb-3">
+                <div>
+                  {/* Org — linked if available */}
+                  {item.link ? (
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-accent hover:text-blue-400 font-semibold text-base transition-colors duration-200"
+                    >
+                      {item.org}
+                      <ArrowUpRight size={13} className="opacity-60" />
+                    </a>
+                  ) : (
+                    <span className="font-semibold text-accent text-base">{item.org}</span>
+                  )}
 
-                  <p className="text-muted text-sm leading-relaxed mb-4">{item.description}</p>
-
-                  <div className="flex flex-wrap gap-2">
-                    {item.tags.map((tag) => (
-                      <span key={tag} className="tag-base">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  {/* Role */}
+                  <p className="text-text text-sm mt-0.5">
+                    {item.role.includes('Coulter Scholar') ? (
+                      <>
+                        {item.role.split('Coulter Scholar')[0]}
+                        <a
+                          href="https://students.dartmouth.edu/surfd/scholar-programs/coulter-scholars"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-text-dim hover:text-accent transition-colors"
+                        >
+                          Coulter Scholar
+                        </a>
+                        {item.role.split('Coulter Scholar')[1]}
+                      </>
+                    ) : (
+                      item.role
+                    )}
+                  </p>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+
+                {/* Period */}
+                <span className="text-xs font-mono text-subtle whitespace-nowrap pt-0.5 shrink-0">
+                  {item.period}
+                </span>
+              </div>
+
+              {/* Description */}
+              <p className="text-muted text-sm leading-relaxed mb-4">
+                {item.description}
+              </p>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-1.5">
+                {item.tags.map((tag) => (
+                  <span key={tag} className="tag-base text-[11px]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          ))}
         </div>
+
       </div>
     </section>
   )
 }
-

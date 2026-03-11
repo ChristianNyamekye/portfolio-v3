@@ -3,6 +3,7 @@ const isGHPages = process.env.GITHUB_PAGES === 'true'
 
 const nextConfig = {
   devIndicators: false,
+  vercelToolbar: { enabled: false },
   trailingSlash: true,
   images: {
     unoptimized: true,
