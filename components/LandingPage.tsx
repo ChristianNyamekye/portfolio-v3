@@ -6,12 +6,12 @@ import Matter from 'matter-js'
 const GRAVITY = 0.25
 const PENDULUM_DELAY = 1250
 const PENDULUM_RELEASE = 8000
-const RESTITUTION_TEXT = 0.2
-const RESTITUTION_IMG = 0.75
-const FRICTION_TEXT = 0.007
-const FRICTION_IMG = 0.05
-const AIR_TEXT = 0.001
-const AIR_IMG = 0.01
+const RESTITUTION_TEXT = 0.15
+const RESTITUTION_IMG = 0.3
+const FRICTION_TEXT = 0.3
+const FRICTION_IMG = 0.5
+const AIR_TEXT = 0.01
+const AIR_IMG = 0.02
 const WALL_THICKNESS = 100 // Thicker walls to prevent escape
 
 interface TextItem {
@@ -92,7 +92,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     })
 
     // Engine
-    const engine = Matter.Engine.create({ gravity: { y: GRAVITY } })
+    const engine = Matter.Engine.create({ gravity: { y: GRAVITY }, enableSleeping: true })
     const runner = Matter.Runner.create()
     Matter.Runner.run(runner, engine)
 
@@ -100,7 +100,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const wall = (x: number, y: number, w: number, h: number) =>
       Matter.Bodies.rectangle(x, y, w, h, { isStatic: true, restitution: 0.5 })
     Matter.Composite.add(engine.world, [
-      wall(W / 2, H + WALL_THICKNESS / 2, W * 3, WALL_THICKNESS),       // floor
+      wall(W / 2, H - 1 + WALL_THICKNESS / 2, W * 3, WALL_THICKNESS),   // floor — flush with bottom
       wall(W / 2, -WALL_THICKNESS / 2, W * 3, WALL_THICKNESS),          // ceiling
       wall(-WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 3),          // left
       wall(W + WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 3),       // right
@@ -138,13 +138,16 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const drop = (b: Matter.Body) => {
       Matter.Body.setStatic(b, false)
       Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0 })
-      Matter.Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.05)
+      Matter.Body.setAngularVelocity(b, 0)
     }
 
-    // Staggered timed drops — top body first via pendulum, then each subsequent body
-    // drops after a short delay. No body gets stuck.
+    // Collision-based cascade — top body drops first via pendulum,
+    // others activate when hit by a moving body
     const sorted = [...allBodies].sort((a, b) => a.position.y - b.position.y)
     const topBody = sorted[0]
+    const staticBodies = new Set<Matter.Body>(sorted.slice(1))
+    ;(topBody as any)._isActive = true
+    linkBodies.forEach((b) => { (b as any)._isActive = true })
 
     // Pendulum for top body
     setTimeout(() => {
@@ -170,32 +173,30 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       }, PENDULUM_RELEASE)
     }, PENDULUM_DELAY)
 
-    // Staggered drops for remaining bodies — collision OR timeout, whichever first
-    const dropped = new Set<Matter.Body>([topBody])
-
-    sorted.slice(1).forEach((body, i) => {
-      // Each body drops after staggered delay (even without collision)
-      setTimeout(() => {
-        if (!dropped.has(body)) {
-          dropped.add(body)
-          drop(body)
-        }
-      }, PENDULUM_DELAY + 800 + i * 400)
-    })
-
-    // Also drop on collision (faster cascade if things collide)
+    // Collision cascade — moving body hits static → static drops
     Matter.Events.on(engine, 'collisionStart', ({ pairs }) => {
       pairs.forEach(({ bodyA: a, bodyB: b }) => {
-        if (!a.isStatic && b.isStatic && !dropped.has(b)) {
-          dropped.add(b)
+        if ((a as any)._isActive && !a.isStatic && staticBodies.has(b)) {
+          staticBodies.delete(b)
+          ;(b as any)._isActive = true
           drop(b)
         }
-        if (!b.isStatic && a.isStatic && !dropped.has(a)) {
-          dropped.add(a)
+        if ((b as any)._isActive && !b.isStatic && staticBodies.has(a)) {
+          staticBodies.delete(a)
+          ;(a as any)._isActive = true
           drop(a)
         }
       })
     })
+
+    // Safety net — if anything is still static after 15s, drop it
+    setTimeout(() => {
+      staticBodies.forEach((b) => {
+        staticBodies.delete(b)
+        ;(b as any)._isActive = true
+        drop(b)
+      })
+    }, 15000)
 
     // Clamp velocity to prevent bodies from escaping
     Matter.Events.on(engine, 'beforeUpdate', () => {
