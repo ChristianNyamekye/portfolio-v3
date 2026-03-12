@@ -71,20 +71,29 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const imgX = cx
     const imgY = cy
 
-    // Domino layout — each item positioned so it will be hit by the one above.
-    // "welcome" swings on pendulum → hits "to" → hits "the" → ... → sketch last
-    const step = fontSize * 1.6  // vertical gap — close enough for domino contact
+    // Circular arrangement — words orbit around center like Rene's layout
+    // Positioned close enough along the arc for domino cascade via collision
+    const orbitR = Math.min(W, H) * 0.30 // orbit radius
+    // Words placed clockwise from top-left, each ~45° apart
+    // Angles (radians): top-left to bottom-right sweep
+    const positions: { a: number; rMul: number }[] = [
+      { a: -2.4, rMul: 1.15 },  // welcome — top-left (pendulum)
+      { a: -1.8, rMul: 1.05 },  // to — upper-left
+      { a: -1.2, rMul: 0.95 },  // the — left
+      { a: -0.5, rMul: 1.10 },  // portfolio — lower-left
+      { a: 0.3,  rMul: 1.00 },  // site — bottom
+      { a: 1.0,  rMul: 0.90 },  // of — lower-right
+      { a: 1.7,  rMul: 1.05 },  // <CN/> — right
+    ]
 
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      // Pendulum word (topmost)
-      { label: 'welcome',   x: cx - step * 0.5, y: cy - step * 3,    angle: -0.10, isLink: false, href: null, fill: textColor },
-      // Each one slightly offset horizontally for the arc, but vertically stacked for domino
-      { label: 'to',        x: cx - step * 0.8, y: cy - step * 2,    angle: -0.18, isLink: false, href: null, fill: textColor },
-      { label: 'the',       x: cx - step * 1.0, y: cy - step * 1,    angle: -0.25, isLink: false, href: null, fill: textColor },
-      { label: 'portfolio', x: cx - step * 0.7, y: cy,                angle: -0.30, isLink: true, href: '__portfolio__', fill: linkColor },
-      { label: 'site',      x: cx - step * 0.3, y: cy + step * 1,    angle: -0.22, isLink: false, href: null, fill: textColor },
-      { label: 'of',        x: cx + step * 0.2, y: cy + step * 1.8,  angle: -0.15, isLink: false, href: null, fill: textColor },
-      { label: '<CN/>',     x: cx + step * 0.6, y: cy + step * 2.5,  angle: -0.08, isLink: false, href: null, fill: linkColor, isBrand: true },
+      { label: 'welcome',   x: cx + Math.cos(positions[0].a) * orbitR * positions[0].rMul, y: cy + Math.sin(positions[0].a) * orbitR * positions[0].rMul, angle: positions[0].a * 0.12, isLink: false, href: null, fill: textColor },
+      { label: 'to',        x: cx + Math.cos(positions[1].a) * orbitR * positions[1].rMul, y: cy + Math.sin(positions[1].a) * orbitR * positions[1].rMul, angle: positions[1].a * 0.10, isLink: false, href: null, fill: textColor },
+      { label: 'the',       x: cx + Math.cos(positions[2].a) * orbitR * positions[2].rMul, y: cy + Math.sin(positions[2].a) * orbitR * positions[2].rMul, angle: positions[2].a * 0.08, isLink: false, href: null, fill: textColor },
+      { label: 'portfolio', x: cx + Math.cos(positions[3].a) * orbitR * positions[3].rMul, y: cy + Math.sin(positions[3].a) * orbitR * positions[3].rMul, angle: positions[3].a * 0.10, isLink: true, href: '__portfolio__', fill: linkColor },
+      { label: 'site',      x: cx + Math.cos(positions[4].a) * orbitR * positions[4].rMul, y: cy + Math.sin(positions[4].a) * orbitR * positions[4].rMul, angle: positions[4].a * 0.08, isLink: false, href: null, fill: textColor },
+      { label: 'of',        x: cx + Math.cos(positions[5].a) * orbitR * positions[5].rMul, y: cy + Math.sin(positions[5].a) * orbitR * positions[5].rMul, angle: positions[5].a * 0.06, isLink: false, href: null, fill: textColor },
+      { label: '<CN/>',     x: cx + Math.cos(positions[6].a) * orbitR * positions[6].rMul, y: cy + Math.sin(positions[6].a) * orbitR * positions[6].rMul, angle: positions[6].a * 0.05, isLink: false, href: null, fill: linkColor, isBrand: true },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
@@ -99,8 +108,11 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     Matter.Runner.run(runner, engine)
 
     // Walls — extra thick + ceiling to prevent escape
-    const wall = (x: number, y: number, w: number, h: number) =>
-      Matter.Bodies.rectangle(x, y, w, h, { isStatic: true, restitution: 0.5 })
+    const wall = (x: number, y: number, w: number, h: number) => {
+      const b = Matter.Bodies.rectangle(x, y, w, h, { isStatic: true, restitution: 0.5 })
+      ;(b as any)._isWall = true
+      return b
+    }
     Matter.Composite.add(engine.world, [
       wall(W / 2, H - 1 + WALL_THICKNESS / 2, W * 3, WALL_THICKNESS),   // floor — flush with bottom
       wall(W / 2, -WALL_THICKNESS / 2, W * 3, WALL_THICKNESS),          // ceiling
@@ -109,8 +121,8 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     ])
 
     // Sketch body — participates in physics
-    // Sketch at the end of the domino chain
-    const sketchBody = Matter.Bodies.rectangle(cx + step * 0.8, cy + step * 3.3, imgW * 0.8, imgH * 0.8, {
+    // Sketch in center of the orbit
+    const sketchBody = Matter.Bodies.rectangle(cx, cy, imgW * 0.8, imgH * 0.8, {
       restitution: RESTITUTION_IMG,
       friction: FRICTION_IMG,
       frictionAir: AIR_IMG,
@@ -145,62 +157,59 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       Matter.Body.setAngularVelocity(b, 0)
     }
 
-    // Rene-style: top word swings on a pendulum, then releases and
-    // knocks into other words via collision cascade.
-    const sorted = [...allBodies].sort((a, b) => a.position.y - b.position.y)
-    const topBody = sorted[0]
-    const staticBodies = new Set<Matter.Body>(sorted.slice(1))
+    // Pendulum cascade — "welcome" swings from top-center on a long rope,
+    // sweeping across the circular layout and knocking words one by one.
+    // Find "welcome" (first text body added)
+    const welcomeBody = allBodies.find(b => !(b as any)._isSketch)!
+    const otherBodies = new Set<Matter.Body>(allBodies.filter(b => b !== welcomeBody))
 
-    // Mark all bodies so collision cascade can propagate
-    ;(topBody as any)._isActive = true
+    ;(welcomeBody as any)._isActive = true
 
-    // Pendulum — top word starts swinging after 1.2s
+    // Pendulum — "welcome" hangs from top-center, swings through the layout
     setTimeout(() => {
-      Matter.Body.setStatic(topBody, false)
-      Matter.Sleeping.set(topBody, false)
-      Matter.Body.setVelocity(topBody, { x: 0, y: 0 })
+      Matter.Body.setStatic(welcomeBody, false)
+      Matter.Sleeping.set(welcomeBody, false)
 
-      const hx = (topBody.bounds.max.x - topBody.bounds.min.x) / 2
-      const hy = (topBody.bounds.max.y - topBody.bounds.min.y) / 2
-
+      // Anchor at top-center of the canvas, long rope so it swings wide
+      const ropeLength = orbitR * 1.8
       const pendulum = Matter.Constraint.create({
-        pointA: { x: topBody.position.x + hx, y: topBody.position.y - hy },
-        bodyB: topBody,
-        pointB: { x: hx, y: -hy },
-        stiffness: 0.02,
-        damping: 0.01,
-        length: 0,
+        pointA: { x: cx, y: cy - ropeLength - fontSize },
+        bodyB: welcomeBody,
+        stiffness: 0.015,
+        damping: 0.005,
+        length: ropeLength,
       })
       Matter.Composite.add(engine.world, pendulum)
 
-      // Release pendulum after 6s — word falls freely
+      // Give it a push to start swinging
+      Matter.Body.setVelocity(welcomeBody, { x: 6, y: 0 })
+
+      // Release pendulum after 5s — word falls freely into remaining items
       setTimeout(() => {
         Matter.Composite.remove(engine.world, pendulum)
-        Matter.Body.setVelocity(topBody, { x: (Math.random() - 0.5) * 3, y: 1 })
-      }, 6000)
-    }, 1200)
+      }, 5000)
+    }, 1500)
 
-    // Collision cascade — when a moving body hits a static one, the static one drops
+    // Collision cascade — any active body hitting a static body activates it
     Matter.Events.on(engine, 'collisionStart', ({ pairs }) => {
-      pairs.forEach(({ bodyA: a, bodyB: b }) => {
-        if ((a as any)._isActive && !a.isStatic && staticBodies.has(b)) {
-          staticBodies.delete(b)
+      for (const { bodyA: a, bodyB: b } of pairs) {
+        // Skip wall collisions
+        if ((a as any)._isWall || (b as any)._isWall) continue
+
+        if ((a as any)._isActive && !a.isStatic && otherBodies.has(b)) {
+          otherBodies.delete(b)
           ;(b as any)._isActive = true
           Matter.Body.setStatic(b, false)
           Matter.Sleeping.set(b, false)
-          Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0.5 })
         }
-        if ((b as any)._isActive && !b.isStatic && staticBodies.has(a)) {
-          staticBodies.delete(a)
+        if ((b as any)._isActive && !b.isStatic && otherBodies.has(a)) {
+          otherBodies.delete(a)
           ;(a as any)._isActive = true
           Matter.Body.setStatic(a, false)
           Matter.Sleeping.set(a, false)
-          Matter.Body.setVelocity(a, { x: (Math.random() - 0.5) * 2, y: 0.5 })
         }
-      })
+      }
     })
-
-    // No safety net needed — domino layout guarantees full cascade
 
     // Clamp velocity to prevent bodies from escaping
     Matter.Events.on(engine, 'beforeUpdate', () => {
