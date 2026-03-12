@@ -6,7 +6,6 @@ import Matter from 'matter-js'
 const GRAVITY = 0.25
 const PENDULUM_DELAY = 1250
 const PENDULUM_RELEASE = 8000
-const FONT_SIZE = 28
 const RESTITUTION_TEXT = 0.2
 const RESTITUTION_IMG = 0.75
 const FRICTION_TEXT = 0.007
@@ -47,47 +46,37 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const ctx = canvas.getContext('2d')!
     ctx.scale(dpr, dpr)
 
-    // Detect dark mode
+    // Theme
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     const bgColor = isDark ? '#111111' : '#f7f5f2'
     const textColor = isDark ? '#e8e6e3' : '#000000'
     const linkColor = isDark ? '#5b8def' : '#2563eb'
 
-    // Font sizing — scale with viewport
-    const fontSize = Math.round(FONT_SIZE * Math.min(W / 1400, 1))
+    // Font — scale with viewport, mobile-friendly
+    const baseFontSize = W < 600 ? 22 : W < 900 ? 26 : 28
+    const fontSize = Math.round(baseFontSize * Math.min(W / 1400, 1.2))
     const measure = document.createElement('canvas').getContext('2d')!
     measure.font = `700 ${fontSize}px Helvetica, Arial, sans-serif`
 
-    // Center point
     const cx = W / 2
     const cy = H / 2
 
-    // Load sketch
+    // Load sketch (transparent PNG)
     const sketch = new Image()
     sketch.src = '/sketch.png'
-    const imgW = Math.min(280, W * 0.35)
+    const imgW = W < 600 ? Math.min(160, W * 0.4) : Math.min(240, W * 0.25)
     const imgH = imgW
-    const imgX = cx
-    const imgY = cy + fontSize * 2
 
-    // Text items — arranged in an arc around the sketch
+    // Text items: "WELCOME TO MY PORTFOLIO" — each word separate, PORTFOLIO is link
+    // Arranged scattered like Rene's style
+    const spacing = fontSize * 1.8
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      // Bio words curving around the sketch
-      { label: 'CHRISTIAN', x: cx - fontSize * 5.5, y: cy + fontSize * 2.2, angle: -0.18, isLink: false, href: null, fill: textColor },
-      { label: 'NYAMEKYE', x: cx - fontSize * 3.5, y: cy + fontSize * 1.2, angle: -0.38, isLink: false, href: null, fill: textColor },
-      { label: 'IS AN', x: cx - fontSize * 2, y: cy + fontSize * 2, angle: -0.43, isLink: false, href: null, fill: textColor },
-      { label: 'ENGINEER', x: cx - fontSize * 0.5, y: cy + fontSize * 0.5, angle: -0.66, isLink: false, href: null, fill: textColor },
-      { label: '& BUILDER', x: cx + fontSize * 3, y: cy - fontSize * 0.8, angle: -0.46, isLink: false, href: null, fill: textColor },
-      { label: 'BASED IN', x: cx + fontSize * 5, y: cy - fontSize * 0.2, angle: -0.27, isLink: false, href: null, fill: textColor },
-      { label: 'NEW YORK.', x: cx + fontSize * 7, y: cy - fontSize * 0.5, angle: -0.11, isLink: false, href: null, fill: textColor },
-
-      // "welcome to my" as plain text, "portfolio site" as link
-      { label: 'WELCOME', x: cx - fontSize * 1.5, y: cy - fontSize * 5, angle: -0.08, isLink: false, href: null, fill: textColor },
-      { label: 'TO MY', x: cx - fontSize * 0.5, y: cy - fontSize * 4, angle: -0.15, isLink: false, href: null, fill: textColor },
-      { label: 'PORTFOLIO SITE', x: cx + fontSize * 1.5, y: cy - fontSize * 3, angle: -0.22, isLink: true, href: '__portfolio__', fill: linkColor },
+      { label: 'WELCOME', x: cx - spacing * 1.2, y: cy - spacing * 1.5, angle: -0.12, isLink: false, href: null, fill: textColor },
+      { label: 'TO', x: cx - spacing * 0.3, y: cy - spacing * 0.8, angle: -0.20, isLink: false, href: null, fill: textColor },
+      { label: 'MY', x: cx + spacing * 0.4, y: cy - spacing * 0.3, angle: -0.30, isLink: false, href: null, fill: textColor },
+      { label: 'PORTFOLIO', x: cx + spacing * 0.2, y: cy + spacing * 0.4, angle: -0.18, isLink: true, href: '__portfolio__', fill: linkColor },
     ]
 
-    // Measure widths
     const items: TextItem[] = rawItems.map((item) => {
       const tw = measure.measureText(item.label).width
       return { ...item, w: Math.max(tw, 20), h: Math.max(fontSize, 20) }
@@ -108,18 +97,19 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       wall(W + WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 2),
     ])
 
-    // Sketch body
-    const sketchBody = Matter.Bodies.rectangle(imgX, imgY, imgW, imgH, {
+    // Sketch body — participates in physics (falls too)
+    const sketchBody = Matter.Bodies.rectangle(cx, cy + spacing * 1.5, imgW, imgH, {
       restitution: RESTITUTION_IMG,
       friction: FRICTION_IMG,
       frictionAir: AIR_IMG,
-      collisionFilter: { category: 0x0002, mask: 0x0001 },
+      collisionFilter: { category: 0x0001, mask: 0x0001 },
     })
     Matter.Body.setStatic(sketchBody, true)
+    ;(sketchBody as any)._isSketch = true
     Matter.Composite.add(engine.world, sketchBody)
 
     // Text bodies
-    const bodies = items.map((item) => {
+    const textBodies = items.map((item) => {
       const b = Matter.Bodies.rectangle(item.x, item.y, item.w, item.h, {
         restitution: RESTITUTION_TEXT,
         friction: FRICTION_TEXT,
@@ -131,10 +121,11 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       Matter.Body.setStatic(b, true)
       return b
     })
-    Matter.Composite.add(engine.world, bodies)
+    Matter.Composite.add(engine.world, textBodies)
 
-    const linkBodies = bodies.filter((b) => (b as any)._meta.isLink)
-    const wordBodies = bodies.filter((b) => !(b as any)._meta.isLink)
+    // All physics bodies (text + sketch)
+    const allBodies = [...textBodies, sketchBody]
+    const linkBodies = textBodies.filter((b) => (b as any)._meta.isLink)
 
     const drop = (b: Matter.Body) => {
       Matter.Body.setStatic(b, false)
@@ -142,11 +133,12 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       Matter.Body.setAngularVelocity(b, 0)
     }
 
-    // Cascade — top element drops first via pendulum, collisions activate the rest
-    const sorted = [...bodies].sort((a, b) => a.position.y - b.position.y)
+    // Cascade — top element drops first, collisions activate the rest
+    const sorted = [...allBodies].sort((a, b) => a.position.y - b.position.y)
     const topBody = sorted[0]
     const staticBodies = new Set<Matter.Body>(sorted.slice(1))
     ;(topBody as any)._isActive = true
+    // Mark all link bodies as active so they can trigger cascades
     linkBodies.forEach((b) => { (b as any)._isActive = true })
 
     // Pendulum for top body
@@ -189,7 +181,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       })
     })
 
-    // Mouse interaction
+    // Mouse drag
     const mouse = Matter.Mouse.create(canvas)
     mouse.pixelRatio = dpr
     Matter.Composite.add(engine.world, Matter.MouseConstraint.create(engine, {
@@ -200,34 +192,38 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     // Click detection
     let mouseDownPos = { x: 0, y: 0 }
     const hitTest = (b: Matter.Body, px: number, py: number) => {
+      const meta = (b as any)._meta
+      if (!meta) return false
       const dx = px - b.position.x
       const dy = py - b.position.y
       const cos = Math.cos(-b.angle)
       const sin = Math.sin(-b.angle)
       const lx = dx * cos - dy * sin
       const ly = dx * sin + dy * cos
-      return Math.abs(lx) < (b as any)._meta.w / 2 + 5 && Math.abs(ly) < (b as any)._meta.h / 2 + 5
+      return Math.abs(lx) < meta.w / 2 + 5 && Math.abs(ly) < meta.h / 2 + 5
     }
 
     canvas.addEventListener('mousedown', (e) => {
       mouseDownPos = { x: e.clientX, y: e.clientY }
     })
-
     canvas.addEventListener('click', (e) => {
       const dx = e.clientX - mouseDownPos.x
       const dy = e.clientY - mouseDownPos.y
       if (dx * dx + dy * dy > 25) return
       const hit = linkBodies.find((b) => hitTest(b, e.clientX, e.clientY))
-      if (hit) {
-        const href = (hit as any)._meta.href
-        if (href === '__portfolio__') onEnter()
-        else window.open(href, '_blank')
-      }
+      if (hit) onEnter()
     })
-
     canvas.addEventListener('mousemove', (e) => {
       const hit = linkBodies.find((b) => hitTest(b, e.clientX, e.clientY))
       canvas.style.cursor = hit ? 'pointer' : 'default'
+    })
+
+    // Touch support for mobile
+    canvas.addEventListener('touchend', (e) => {
+      const touch = e.changedTouches[0]
+      if (!touch) return
+      const hit = linkBodies.find((b) => hitTest(b, touch.clientX, touch.clientY))
+      if (hit) onEnter()
     })
 
     // Render loop
@@ -240,7 +236,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       ctx.fillStyle = bgColor
       ctx.fillRect(0, 0, W, H)
 
-      // Draw sketch
+      // Draw sketch (with physics)
       if (sketch.complete && sketch.naturalWidth > 0) {
         ctx.save()
         ctx.translate(sketchBody.position.x, sketchBody.position.y)
@@ -254,14 +250,13 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
 
-      bodies.forEach((body) => {
+      textBodies.forEach((body) => {
         const meta = (body as any)._meta as TextItem
         ctx.save()
         ctx.translate(body.position.x, body.position.y)
         ctx.rotate(body.angle)
         ctx.fillStyle = meta.fill
         ctx.fillText(meta.label, 0, 0)
-
         if (meta.isLink) {
           ctx.fillRect(-meta.w / 2, underlineY, meta.w, underlineH)
         }
