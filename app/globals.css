@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
-@import url('https://api.fontshare.com/v2/css?f[]=sentient@400,400i,500,600,700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=sentient@400,400i,500,500i,600,700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Light theme (default) ── */
 :root {
   --background: #f7f5f2;
   --surface: #edebe8;
@@ -13,6 +14,19 @@
   --dim: #4a4a4a;
   --muted: #8a8a8a;
   --accent: #2563eb;
+}
+
+/* ── Dark theme (system preference) ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #111111;
+    --surface: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #e8e6e3;
+    --dim: #a0a0a0;
+    --muted: #6b6b6b;
+    --accent: #5b8def;
+  }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,6 +44,7 @@ body {
   line-height: 1.7;
   overflow-x: hidden;
   font-size: 15px;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 ::selection {
@@ -39,11 +54,9 @@ body {
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--background); }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
 a { color: inherit; text-decoration: none; }
-
-
 
 @layer utilities {
   .font-mono { font-family: 'JetBrains Mono', monospace; }

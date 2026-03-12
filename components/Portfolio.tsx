@@ -81,8 +81,8 @@ export default function Portfolio() {
               />
             </div>
             <div>
-              <h1 className="text-sm font-medium tracking-tight">Christian Nyamekye</h1>
-              <p className="text-[11px] text-[var(--muted)] italic">{hero.eyebrow}</p>
+              <h1 className="text-sm font-medium italic tracking-tight">Christian Nyamekye</h1>
+              <span className="text-[11px] text-[var(--muted)] italic"> — {hero.eyebrow}</span>
             </div>
           </div>
         </Reveal>
@@ -98,9 +98,9 @@ export default function Portfolio() {
           <div className="flex flex-wrap gap-1.5 mt-1">
             <Pill href={meta.social.github} label="GitHub" />
             <Pill href={meta.social.linkedin} label="LinkedIn" />
-            <Pill href={meta.social.twitter} label="X" />
             <Pill href={`mailto:${meta.email}`} label="Email" />
             <Pill href="https://docs.google.com/document/d/1baFxz880bwpHy8L0S91R3N1W0Ou0C3GJbxlDbjYw9Yo/edit?tab=t.0" label="Resume" />
+            <Pill href={meta.social.twitter} label="X" />
           </div>
         </Reveal>
       </header>
