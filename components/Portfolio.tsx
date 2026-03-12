@@ -81,8 +81,8 @@ export default function Portfolio() {
               />
             </div>
             <div>
-              <h1 className="text-sm font-semibold tracking-tight">Christian Nyamekye</h1>
-              <p className="text-[11px] text-[var(--muted)]">{hero.eyebrow}</p>
+              <h1 className="text-sm font-medium tracking-tight">Christian Nyamekye</h1>
+              <p className="text-[11px] text-[var(--muted)] italic">{hero.eyebrow}</p>
             </div>
           </div>
         </Reveal>
@@ -122,7 +122,7 @@ export default function Portfolio() {
                 </span>
               </div>
 
-              <h2 className="text-xl font-semibold tracking-tight mb-3">{project.name}</h2>
+              <h2 className="text-lg font-semibold tracking-tight mb-3">{project.name}</h2>
 
               <p className="text-sm text-[var(--dim)] leading-relaxed mb-4">
                 {shortDescriptions[project.id] || project.description}

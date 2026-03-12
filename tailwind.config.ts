@@ -18,9 +18,9 @@ const config: Config = {
         text: 'var(--text)',
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ['Sentient', 'Georgia', 'serif'],
+        serif: ['Sentient', 'Georgia', 'serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        serif: ['Playfair Display', 'Georgia', 'serif'],
       },
       animation: {
         'gradient-shift': 'gradient-shift 8s ease infinite',
