@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import { Github, ExternalLink, ChevronRight, ChevronDown } from 'lucide-react'
 import {
   meta,
@@ -67,7 +67,7 @@ export default function Portfolio() {
   const [showExp, setShowExp] = useState(false)
 
   return (
-    <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col justify-between">
+    <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col">
 
       {/* ── Header ── */}
       <header className="pt-6 pb-0 flex-shrink-0">
@@ -146,40 +146,35 @@ export default function Portfolio() {
           Notable Projects ({notableProjects.length})
           <ChevronDown size={12} className={`transition-transform duration-200 ${showNotable ? 'rotate-180' : ''}`} />
         </button>
-        <AnimatePresence>
-          {showNotable && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
-              <div className="mt-4 space-y-4">
-                {notableProjects.map((p) => (
-                  <div key={p.name} className="flex items-start justify-between gap-3 py-2 border-b border-[var(--border)] last:border-0">
-                    <div className="min-w-0">
-                      <h3 className="text-sm font-medium text-[var(--text)] mb-0.5">{p.name}</h3>
-                      <p className="text-xs text-[var(--muted)] leading-relaxed">{p.description}</p>
-                    </div>
-                    <div className="flex gap-2 shrink-0 pt-1">
-                      {p.github && (
-                        <a href={p.github} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors">
-                          <Github size={13} />
-                        </a>
-                      )}
-                      {p.link && (
-                        <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors">
-                          <ExternalLink size={13} />
-                        </a>
-                      )}
-                    </div>
+        <div
+          className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+          style={{ gridTemplateRows: showNotable ? '1fr' : '0fr' }}
+        >
+          <div className="overflow-hidden">
+            <div className="mt-3 space-y-4 pb-1">
+              {notableProjects.map((p) => (
+                <div key={p.name} className="flex items-start justify-between gap-3 py-2 border-b border-[var(--border)] last:border-0">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-medium text-[var(--text)] mb-0.5">{p.name}</h3>
+                    <p className="text-xs text-[var(--muted)] leading-relaxed">{p.description}</p>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  <div className="flex gap-2 shrink-0 pt-1">
+                    {p.github && (
+                      <a href={p.github} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors">
+                        <Github size={13} />
+                      </a>
+                    )}
+                    {p.link && (
+                      <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors">
+                        <ExternalLink size={13} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ── Experience (collapsible) ── */}
@@ -191,33 +186,28 @@ export default function Portfolio() {
           Experience ({experience.length})
           <ChevronDown size={12} className={`transition-transform duration-200 ${showExp ? 'rotate-180' : ''}`} />
         </button>
-        <AnimatePresence>
-          {showExp && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
-              <div className="mt-4 space-y-4">
-                {experience.map((exp) => (
-                  <div key={`${exp.org}-${exp.role}`} className="py-2 border-b border-[var(--border)] last:border-0">
-                    <div className="flex items-baseline justify-between gap-3 mb-0.5">
-                      <span className="text-sm font-medium text-[var(--text)]">
-                        {exp.link ? (
-                          <a href={exp.link} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent)] transition-colors">{exp.org}</a>
-                        ) : exp.org}
-                      </span>
-                      <span className="text-[10px] font-mono text-[var(--muted)] shrink-0">{exp.period}</span>
-                    </div>
-                    <p className="text-xs text-[var(--dim)]">{exp.role}</p>
+        <div
+          className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+          style={{ gridTemplateRows: showExp ? '1fr' : '0fr' }}
+        >
+          <div className="overflow-hidden">
+            <div className="mt-3 space-y-4 pb-1">
+              {experience.map((exp) => (
+                <div key={`${exp.org}-${exp.role}`} className="py-2 border-b border-[var(--border)] last:border-0">
+                  <div className="flex items-baseline justify-between gap-3 mb-0.5">
+                    <span className="text-sm font-medium text-[var(--text)]">
+                      {exp.link ? (
+                        <a href={exp.link} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent)] transition-colors">{exp.org}</a>
+                      ) : exp.org}
+                    </span>
+                    <span className="text-[10px] font-mono text-[var(--muted)] shrink-0">{exp.period}</span>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  <p className="text-xs text-[var(--dim)]">{exp.role}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ── Archive ── */}
@@ -229,29 +219,24 @@ export default function Portfolio() {
           Archive ({otherProjects.length})
           <ChevronDown size={11} className={`transition-transform duration-200 ${showArchive ? 'rotate-180' : ''}`} />
         </button>
-        <AnimatePresence>
-          {showArchive && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
-              <div className="mt-4 space-y-3">
-                {otherProjects.map((p) => (
-                  <div key={p.name} className="flex items-baseline justify-between gap-3 py-1">
-                    <span className="text-xs text-[var(--text)]">{p.name}</span>
-                    <div className="flex gap-2 shrink-0">
-                      {p.github && <a href={p.github} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors"><Github size={11} /></a>}
-                      {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors"><ExternalLink size={11} /></a>}
-                    </div>
+        <div
+          className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+          style={{ gridTemplateRows: showArchive ? '1fr' : '0fr' }}
+        >
+          <div className="overflow-hidden">
+            <div className="mt-3 space-y-3 pb-1">
+              {otherProjects.map((p) => (
+                <div key={p.name} className="flex items-baseline justify-between gap-3 py-1">
+                  <span className="text-xs text-[var(--text)]">{p.name}</span>
+                  <div className="flex gap-2 shrink-0">
+                    {p.github && <a href={p.github} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors"><Github size={11} /></a>}
+                    {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors"><ExternalLink size={11} /></a>}
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ── Footer ── */}
