@@ -71,20 +71,26 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const imgX = cx
     const imgY = cy
 
-    // Clustered layout — words tight around sketch so pendulum cascade works
-    // Gap between words is ~1.2x font height — close enough for collisions
-    const gap = fontSize * 1.3
+    // Snaking path layout — words chain around the sketch so cascade propagates
+    // "welcome" swings → hits "to" → hits "the" → ... → everything falls
+    // Each word within ~1.5 font-heights of the NEXT word in sequence
+    const g = fontSize * 1.8 // gap unit — just close enough for collision
 
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      // "portfolio" is the link — top-left, becomes the pendulum contact
-      { label: 'portfolio', x: cx - gap * 2.2, y: cy - gap * 2.8, angle: -0.15, isLink: true, href: '__portfolio__', fill: linkColor },
-      // Clustered around sketch — each within reach of falling neighbors
-      { label: 'welcome',   x: cx + gap * 1.5, y: cy - gap * 2.5, angle: 0.10,  isLink: false, href: null, fill: textColor },
-      { label: 'to',        x: cx - gap * 3.0, y: cy - gap * 0.8, angle: -0.22, isLink: false, href: null, fill: textColor },
-      { label: 'the',       x: cx + gap * 2.5, y: cy - gap * 0.5, angle: 0.18,  isLink: false, href: null, fill: textColor },
-      { label: 'site',      x: cx - gap * 2.0, y: cy + gap * 1.5, angle: -0.12, isLink: false, href: null, fill: textColor },
-      { label: 'of',        x: cx + gap * 2.0, y: cy + gap * 1.8, angle: 0.14,  isLink: false, href: null, fill: textColor },
-      { label: '<CN/>',     x: cx + gap * 0.3, y: cy + gap * 3.0, angle: -0.06, isLink: false, href: null, fill: linkColor, isBrand: true },
+      // 1. "welcome" — top-left, THE pendulum. Swings right+down to hit "to"
+      { label: 'welcome',   x: cx - g * 2.0, y: cy - g * 2.5, angle: -0.12, isLink: false, href: null, fill: textColor },
+      // 2. "to" — right of welcome, slightly lower. Gets hit first.
+      { label: 'to',        x: cx + g * 0.5, y: cy - g * 1.8, angle: 0.10,  isLink: false, href: null, fill: textColor },
+      // 3. "the" — below-right of "to"
+      { label: 'the',       x: cx + g * 2.0, y: cy - g * 0.5, angle: 0.15,  isLink: false, href: null, fill: textColor },
+      // 4. "portfolio" — below "the", swings left. THE LINK.
+      { label: 'portfolio', x: cx + g * 0.8, y: cy + g * 0.6, angle: -0.08, isLink: true, href: '__portfolio__', fill: linkColor },
+      // 5. "site" — left of portfolio
+      { label: 'site',      x: cx - g * 1.5, y: cy + g * 0.3, angle: -0.18, isLink: false, href: null, fill: textColor },
+      // 6. "of" — below-left of site
+      { label: 'of',        x: cx - g * 2.2, y: cy + g * 1.5, angle: -0.10, isLink: false, href: null, fill: textColor },
+      // 7. "<CN/>" — bottom center
+      { label: '<CN/>',     x: cx + g * 0.2, y: cy + g * 2.5, angle: -0.05, isLink: false, href: null, fill: linkColor, isBrand: true },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
@@ -151,14 +157,12 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       Matter.Body.setAngularVelocity(b, 0)
     }
 
-    // Rene's approach: topmost link body becomes the pendulum contact.
-    // It pivots from its own top-right corner (length: 0), swings under gravity.
-    const sortedLinks = [...linkBodies].sort((a, b) => a.position.y - b.position.y)
-    const contactBody = sortedLinks[0]
-    const staticBodies = new Set<Matter.Body>([...wordBodies, ...sortedLinks.slice(1)])
+    // "welcome" is the pendulum — find it by label
+    const contactBody = textBodies.find((b) => (b as any)._meta.label === 'welcome')!
+    const staticBodies = new Set<Matter.Body>(allBodies.filter((b) => b !== contactBody))
 
-    // All link bodies start as "active" — they propagate cascade on collision
-    linkBodies.forEach((b) => { ;(b as any)._isActive = true })
+    // Contact body starts active — propagates cascade on collision
+    ;(contactBody as any)._isActive = true
 
     setTimeout(() => {
       Matter.Body.setStatic(contactBody, false)
