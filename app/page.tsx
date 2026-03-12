@@ -7,6 +7,7 @@ import Portfolio from '@/components/Portfolio'
 import AIAssistant from '@/components/AIAssistant'
 import SmoothScroll from '@/components/SmoothScroll'
 import FooterGradient from '@/components/FooterGradient'
+import FooterReveal from '@/components/FooterReveal'
 
 type Phase = 'landing' | 'portfolio'
 
@@ -46,11 +47,12 @@ export default function Home() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <SmoothScroll />
-          {/* Main content — white bg, sits above the gradient footer */}
-          <main className="relative z-[2] bg-[var(--background)] rounded-b-3xl shadow-[0_4px_30px_rgba(0,0,0,0.08)]">
+          <FooterReveal />
+          {/* Main content — scales down + rounds corners as you scroll, revealing gradient */}
+          <main className="site-surface">
             <Portfolio />
           </main>
-          {/* Gradient footer — revealed as you scroll past main */}
+          {/* Gradient footer — sits behind main at z-1, revealed on scroll */}
           <FooterGradient />
           <AIAssistant />
         </motion.div>

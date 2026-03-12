@@ -10,6 +10,83 @@ html {
   overflow-y: scroll;
 }
 
+/* ── Footer reveal (vlad-style scroll animation) ── */
+@property --footer-g1 { syntax: "<color>"; inherits: true; initial-value: #b2bdbe; }
+@property --footer-g2 { syntax: "<color>"; inherits: true; initial-value: #b2bdbe; }
+@property --footer-g3 { syntax: "<color>"; inherits: true; initial-value: #b2bdbe; }
+
+:root {
+  --page-reveal: 0;
+  --reveal-distance: 520px;
+  --reveal-offset: 20px;
+  --page-scale-amount-base: 0.05;
+  --page-scale-amount: var(--page-scale-amount-base);
+  --max-shrink-px: 180px;
+  --page-radius-max: 32px;
+  --footer-g1: #070a14;
+  --footer-g2: #0b1533;
+  --footer-g3: #1a2a5e;
+  --footer-fg: #ffffff;
+  --footer-link-bg: color-mix(in oklab, #ffffff 18%, transparent);
+  --footer-link-hover-bg: #ffffff;
+  --footer-link-hover-fg: #111110;
+}
+
+@media (max-width: 480px) {
+  :root {
+    --reveal-distance: 760px;
+    --page-scale-amount-base: 0.15;
+    --max-shrink-px: 220px;
+    --page-radius-max: 40px;
+  }
+}
+
+html {
+  background: var(--footer-g3);
+}
+
+html[data-footer-gradient-ready="1"] {
+  transition: --footer-g1 60s linear, --footer-g2 60s linear, --footer-g3 60s linear;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--footer-g1) 20%, var(--footer-g2) 55%, var(--footer-g3) 100%);
+}
+
+.site-surface {
+  position: relative;
+  z-index: 2;
+  background: var(--background);
+  transform-origin: center top;
+  will-change: transform, border-radius;
+  transform: scale(calc(1 - (var(--page-reveal) * var(--page-scale-amount))));
+  border-bottom-left-radius: calc(var(--page-reveal) * var(--page-radius-max));
+  border-bottom-right-radius: calc(var(--page-reveal) * var(--page-radius-max));
+  overflow: hidden;
+}
+
+.site-surface, #site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+.site-surface {
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-surface {
+    box-shadow: none;
+    border-radius: 0;
+    transform: none;
+  }
+}
+
 /* ── Light theme (default) ── */
 :root {
   --background: #f7f5f2;
@@ -43,7 +120,7 @@ html {
 }
 
 body {
-  background: var(--background);
+  position: relative;
   color: var(--text);
   font-family: 'Sentient', Georgia, serif;
   line-height: 1.7;
