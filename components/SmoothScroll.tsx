@@ -9,6 +9,19 @@ export default function SmoothScroll() {
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      prevent: (node: HTMLElement) => {
+        // Don't hijack scroll inside AI assistant or any element with overflow-y auto/scroll
+        let el: HTMLElement | null = node
+        while (el) {
+          if (el.hasAttribute('data-lenis-prevent')) return true
+          const oy = getComputedStyle(el).overflowY
+          if (oy === 'auto' || oy === 'scroll') {
+            if (el.scrollHeight > el.clientHeight) return true
+          }
+          el = el.parentElement
+        }
+        return false
+      },
     })
 
     function raf(time: number) {
