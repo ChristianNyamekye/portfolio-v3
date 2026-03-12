@@ -145,7 +145,7 @@ export default function AIAssistant() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto py-3 px-3 space-y-3 scrollbar-thin">
+              <div className="flex-1 overflow-y-auto py-3 px-3 space-y-3 scrollbar-thin overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
                 {messages.map((msg) => (
                   <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     {msg.role === 'assistant' && (
