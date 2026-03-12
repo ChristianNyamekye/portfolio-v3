@@ -67,10 +67,10 @@ export default function Portfolio() {
   const [showExp, setShowExp] = useState(false)
 
   return (
-    <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col">
+    <div className="max-w-2xl mx-auto px-6">
 
       
-      <header className="pt-8 pb-0 flex-shrink-0">
+      <header className="pt-8 pb-0">
         <Reveal>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--surface)]">
@@ -106,7 +106,7 @@ export default function Portfolio() {
       </header>
 
       
-      <div className="space-y-3 mt-6 flex-1">
+      <div className="space-y-3 mt-6">
         {featuredProjects.map((project, i) => (
           <Reveal key={project.id} delay={i * 0.08}>
             <motion.a
@@ -138,7 +138,7 @@ export default function Portfolio() {
       </div>
 
       
-      <div className="mt-4 flex-shrink-0">
+      <div className="mt-4">
         <button
           onClick={() => setShowNotable(!showNotable)}
           className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5"
@@ -147,7 +147,7 @@ export default function Portfolio() {
           <ChevronDown size={12} className={`transition-transform duration-200 ${showNotable ? 'rotate-180' : ''}`} />
         </button>
         <div
-          className="grid transition-[grid-template-rows] duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+          className="grid transition-[grid-template-rows] duration-[600ms] ease-[cubic-bezier(0.33,1,0.68,1)]"
           style={{ gridTemplateRows: showNotable ? '1fr' : '0fr' }}
         >
           <div className="overflow-hidden">
@@ -187,7 +187,7 @@ export default function Portfolio() {
           <ChevronDown size={12} className={`transition-transform duration-200 ${showExp ? 'rotate-180' : ''}`} />
         </button>
         <div
-          className="grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          className="grid transition-[grid-template-rows] duration-[600ms] ease-[cubic-bezier(0.33,1,0.68,1)]"
           style={{ gridTemplateRows: showExp ? '1fr' : '0fr' }}
         >
           <div className="overflow-hidden">
@@ -220,7 +220,7 @@ export default function Portfolio() {
           <ChevronDown size={11} className={`transition-transform duration-200 ${showArchive ? 'rotate-180' : ''}`} />
         </button>
         <div
-          className="grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          className="grid transition-[grid-template-rows] duration-[600ms] ease-[cubic-bezier(0.33,1,0.68,1)]"
           style={{ gridTemplateRows: showArchive ? '1fr' : '0fr' }}
         >
           <div className="overflow-hidden">
@@ -240,7 +240,7 @@ export default function Portfolio() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-auto pt-6 pb-6 text-xs text-[var(--muted)] flex items-center justify-between flex-shrink-0">
+      <footer className="mt-8 pb-6 text-xs text-[var(--muted)] flex items-center justify-between">
         <p>Dartmouth &apos;26 · EE &amp; CS</p>
         <a href={`mailto:${meta.email}`} className="hover:text-[var(--text)] transition-colors">{meta.email}</a>
       </footer>
