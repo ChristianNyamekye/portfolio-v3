@@ -137,7 +137,8 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
 
     const drop = (b: Matter.Body) => {
       Matter.Body.setStatic(b, false)
-      Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0 })
+      Matter.Sleeping.set(b, false)
+      Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0.5 })
       Matter.Body.setAngularVelocity(b, 0)
     }
 
