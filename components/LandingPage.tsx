@@ -3,15 +3,15 @@
 import { useEffect, useRef, useCallback } from 'react'
 import Matter from 'matter-js'
 
-const GRAVITY = 0.25
+const GRAVITY = 0.5
 const PENDULUM_DELAY = 1250
 const PENDULUM_RELEASE = 8000
-const RESTITUTION_TEXT = 0.15
-const RESTITUTION_IMG = 0.3
-const FRICTION_TEXT = 0.3
-const FRICTION_IMG = 0.5
-const AIR_TEXT = 0.01
-const AIR_IMG = 0.02
+const RESTITUTION_TEXT = 0.25
+const RESTITUTION_IMG = 0.75
+const FRICTION_TEXT = 0.007
+const FRICTION_IMG = 0.05
+const AIR_TEXT = 0.001
+const AIR_IMG = 0.01
 const WALL_THICKNESS = 100 // Thicker walls to prevent escape
 
 interface TextItem {
@@ -71,20 +71,20 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const imgX = cx
     const imgY = cy
 
-    // Organic scattered layout — words placed around sketch like Rene's site
-    // Not a grid, not a column — hand-placed for visual interest
-    const s = Math.min(W, H) * 0.01 // scale unit
+    // Clustered layout — words tight around sketch so pendulum cascade works
+    // Gap between words is ~1.2x font height — close enough for collisions
+    const gap = fontSize * 1.3
 
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      // "portfolio" is the link — positioned top-left, becomes the pendulum contact
-      { label: 'portfolio', x: cx - s * 22, y: cy - s * 18, angle: -0.12, isLink: true, href: '__portfolio__', fill: linkColor },
-      // Words scattered organically around the sketch
-      { label: 'welcome',   x: cx + s * 18, y: cy - s * 22, angle: 0.08,  isLink: false, href: null, fill: textColor },
-      { label: 'to',        x: cx - s * 28, y: cy - s * 5,  angle: -0.20, isLink: false, href: null, fill: textColor },
-      { label: 'the',       x: cx + s * 25, y: cy - s * 8,  angle: 0.15,  isLink: false, href: null, fill: textColor },
-      { label: 'site',      x: cx - s * 20, y: cy + s * 12, angle: -0.10, isLink: false, href: null, fill: textColor },
-      { label: 'of',        x: cx + s * 22, y: cy + s * 10, angle: 0.12,  isLink: false, href: null, fill: textColor },
-      { label: '<CN/>',     x: cx + s * 5,  y: cy + s * 22, angle: -0.05, isLink: false, href: null, fill: linkColor, isBrand: true },
+      // "portfolio" is the link — top-left, becomes the pendulum contact
+      { label: 'portfolio', x: cx - gap * 2.2, y: cy - gap * 2.8, angle: -0.15, isLink: true, href: '__portfolio__', fill: linkColor },
+      // Clustered around sketch — each within reach of falling neighbors
+      { label: 'welcome',   x: cx + gap * 1.5, y: cy - gap * 2.5, angle: 0.10,  isLink: false, href: null, fill: textColor },
+      { label: 'to',        x: cx - gap * 3.0, y: cy - gap * 0.8, angle: -0.22, isLink: false, href: null, fill: textColor },
+      { label: 'the',       x: cx + gap * 2.5, y: cy - gap * 0.5, angle: 0.18,  isLink: false, href: null, fill: textColor },
+      { label: 'site',      x: cx - gap * 2.0, y: cy + gap * 1.5, angle: -0.12, isLink: false, href: null, fill: textColor },
+      { label: 'of',        x: cx + gap * 2.0, y: cy + gap * 1.8, angle: 0.14,  isLink: false, href: null, fill: textColor },
+      { label: '<CN/>',     x: cx + gap * 0.3, y: cy + gap * 3.0, angle: -0.06, isLink: false, href: null, fill: linkColor, isBrand: true },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
@@ -94,7 +94,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     })
 
     // Engine
-    const engine = Matter.Engine.create({ gravity: { y: GRAVITY }, enableSleeping: true })
+    const engine = Matter.Engine.create({ gravity: { y: GRAVITY } })
     const runner = Matter.Runner.create()
     Matter.Runner.run(runner, engine)
 
@@ -202,24 +202,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       })
     })
 
-    // Clamp velocity to prevent bodies from escaping
-    Matter.Events.on(engine, 'beforeUpdate', () => {
-      const maxSpeed = 15
-      allBodies.forEach((b) => {
-        if (b.isStatic) return
-        const v = b.velocity
-        const speed = Math.sqrt(v.x * v.x + v.y * v.y)
-        if (speed > maxSpeed) {
-          const scale = maxSpeed / speed
-          Matter.Body.setVelocity(b, { x: v.x * scale, y: v.y * scale })
-        }
-        // Force back if somehow escaped
-        if (b.position.x < -20) Matter.Body.setPosition(b, { x: 50, y: b.position.y })
-        if (b.position.x > W + 20) Matter.Body.setPosition(b, { x: W - 50, y: b.position.y })
-        if (b.position.y < -20) Matter.Body.setPosition(b, { x: b.position.x, y: 50 })
-        if (b.position.y > H + 20) Matter.Body.setPosition(b, { x: b.position.x, y: H - 50 })
-      })
-    })
+    // No velocity clamping — let physics run naturally like Rene's
 
     // Mouse drag
     const mouse = Matter.Mouse.create(canvas)
