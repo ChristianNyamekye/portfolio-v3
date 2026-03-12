@@ -9,7 +9,7 @@ export const asset = (path: string) => `${BASE}${path}`
 
 export const meta = {
   name: 'Christian Nyamekye',
-  title: 'Christian Nyamekye - Engineer, Builder, Founder',
+  title: 'Christian Nyamekye',
   description:
     'Dartmouth EE+CS. Building at the intersection of hardware, software, and applied AI - from embedded systems and robotics to full-stack platforms.',
   url: 'https://christiannyamekye.com',
