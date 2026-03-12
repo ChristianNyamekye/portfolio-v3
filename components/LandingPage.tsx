@@ -67,14 +67,15 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const imgW = W < 600 ? Math.min(160, W * 0.4) : Math.min(240, W * 0.25)
     const imgH = imgW
 
-    // Text items: "WELCOME TO MY PORTFOLIO" — each word separate, PORTFOLIO is link
-    // Arranged scattered like Rene's style
+    // Text items: "WELCOME TO <CN/>'s PORTFOLIO SITE"
+    // <CN/> gets special rendering (accent color, animated)
     const spacing = fontSize * 1.8
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      { label: 'WELCOME', x: cx - spacing * 1.2, y: cy - spacing * 1.5, angle: -0.12, isLink: false, href: null, fill: textColor },
-      { label: 'TO', x: cx - spacing * 0.3, y: cy - spacing * 0.8, angle: -0.20, isLink: false, href: null, fill: textColor },
-      { label: 'MY', x: cx + spacing * 0.4, y: cy - spacing * 0.3, angle: -0.30, isLink: false, href: null, fill: textColor },
-      { label: 'PORTFOLIO', x: cx + spacing * 0.2, y: cy + spacing * 0.4, angle: -0.18, isLink: true, href: '__portfolio__', fill: linkColor },
+      { label: 'WELCOME', x: cx - spacing * 1.5, y: cy - spacing * 1.8, angle: -0.10, isLink: false, href: null, fill: textColor },
+      { label: 'TO', x: cx - spacing * 0.5, y: cy - spacing * 1.2, angle: -0.18, isLink: false, href: null, fill: textColor },
+      { label: '<CN/>', x: cx + spacing * 0.3, y: cy - spacing * 0.5, angle: -0.08, isLink: false, href: null, fill: linkColor },
+      { label: 'PORTFOLIO', x: cx - spacing * 0.2, y: cy + spacing * 0.3, angle: -0.25, isLink: true, href: '__portfolio__', fill: linkColor },
+      { label: 'SITE', x: cx + spacing * 0.8, y: cy + spacing * 1, angle: -0.15, isLink: false, href: null, fill: textColor },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
@@ -250,15 +251,51 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
 
+      const time = performance.now() / 1000
+
       textBodies.forEach((body) => {
         const meta = (body as any)._meta as TextItem
         ctx.save()
         ctx.translate(body.position.x, body.position.y)
         ctx.rotate(body.angle)
-        ctx.fillStyle = meta.fill
-        ctx.fillText(meta.label, 0, 0)
-        if (meta.isLink) {
-          ctx.fillRect(-meta.w / 2, underlineY, meta.w, underlineH)
+
+        if (meta.label === '<CN/>') {
+          // Animated glow for <CN/>
+          const pulse = 0.5 + 0.5 * Math.sin(time * 2)
+          const glowAlpha = 0.15 + pulse * 0.15
+          ctx.shadowColor = linkColor
+          ctx.shadowBlur = 8 + pulse * 12
+          ctx.globalAlpha = 0.7 + pulse * 0.3
+          ctx.fillStyle = linkColor
+          // Draw brackets slightly dimmer
+          const bracketW = measure.measureText('<').width
+          const slashW = measure.measureText('/').width
+          const cnW = measure.measureText('CN').width
+          const gtW = measure.measureText('>').width
+          const totalW = meta.w
+          const startX = -totalW / 2
+
+          ctx.font = `400 ${fontSize}px Helvetica, Arial, sans-serif`
+          ctx.globalAlpha = 0.5 + pulse * 0.3
+          ctx.textAlign = 'left'
+          ctx.fillText('<', startX, 0)
+          
+          ctx.font = `700 ${fontSize}px Helvetica, Arial, sans-serif`
+          ctx.globalAlpha = 0.8 + pulse * 0.2
+          ctx.fillText('CN', startX + bracketW, 0)
+          
+          ctx.font = `400 ${fontSize}px Helvetica, Arial, sans-serif`
+          ctx.globalAlpha = 0.5 + pulse * 0.3
+          ctx.fillText('/>', startX + bracketW + cnW, 0)
+          
+          ctx.shadowBlur = 0
+          ctx.globalAlpha = 1
+        } else {
+          ctx.fillStyle = meta.fill
+          ctx.fillText(meta.label, 0, 0)
+          if (meta.isLink) {
+            ctx.fillRect(-meta.w / 2, underlineY, meta.w, underlineH)
+          }
         }
         ctx.restore()
       })
