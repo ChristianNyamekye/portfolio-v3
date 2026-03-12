@@ -67,10 +67,10 @@ export default function Portfolio() {
   const [showExp, setShowExp] = useState(false)
 
   return (
-    <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col">
+    <div className="max-w-2xl mx-auto px-6 h-screen flex flex-col overflow-hidden">
 
       {/* ── Header ── */}
-      <header className="pt-8 pb-1">
+      <header className="pt-6 pb-0 flex-shrink-0">
         <Reveal>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--surface)]">
@@ -106,25 +106,25 @@ export default function Portfolio() {
       </header>
 
       {/* ── Featured projects — 3 cards ── */}
-      <div className="space-y-4 mt-6 flex-1 flex flex-col justify-center">
+      <div className="space-y-3 mt-4 flex-1 flex flex-col justify-center min-h-0">
         {featuredProjects.map((project, i) => (
           <Reveal key={project.id} delay={i * 0.08}>
             <motion.a
               href={`/projects/${project.id}`}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.99 }}
-              className="block bg-[var(--surface)] rounded-2xl p-6 md:p-8 transition-shadow duration-300 hover:shadow-lg hover:shadow-black/5"
+              className="block bg-[var(--surface)] rounded-2xl p-5 md:p-6 transition-shadow duration-300 hover:shadow-lg hover:shadow-black/5"
             >
               {/* Category tag */}
-              <div className="flex justify-end mb-4">
-                <span className="text-[11px] text-[var(--muted)] border border-[var(--border)] rounded-full px-3 py-1">
+              <div className="flex justify-end mb-2">
+                <span className="text-[11px] text-[var(--muted)] border border-[var(--border)] rounded-full px-3 py-0.5">
                   {categories[project.id] || project.status}
                 </span>
               </div>
 
-              <h2 className="text-lg font-semibold tracking-tight mb-3">{project.name}</h2>
+              <h2 className="text-base font-semibold tracking-tight mb-1.5">{project.name}</h2>
 
-              <p className="text-sm text-[var(--dim)] leading-relaxed mb-4">
+              <p className="text-sm text-[var(--dim)] leading-relaxed mb-2">
                 {shortDescriptions[project.id] || project.description}
               </p>
 
@@ -138,7 +138,7 @@ export default function Portfolio() {
       </div>
 
       {/* ── Notable projects (collapsible) ── */}
-      <div className="mt-4">
+      <div className="mt-2 flex-shrink-0">
         <button
           onClick={() => setShowNotable(!showNotable)}
           className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5"
@@ -255,7 +255,7 @@ export default function Portfolio() {
       </div>
 
       {/* ── Footer ── */}
-      <footer className="mt-8 pb-6 text-xs text-[var(--muted)] flex items-center justify-between">
+      <footer className="mt-3 pb-4 text-xs text-[var(--muted)] flex items-center justify-between flex-shrink-0">
         <p>Dartmouth &apos;26 · EE & CS</p>
         <a href={`mailto:${meta.email}`} className="hover:text-[var(--text)] transition-colors">{meta.email}</a>
       </footer>
