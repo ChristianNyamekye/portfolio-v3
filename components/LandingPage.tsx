@@ -71,29 +71,20 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const imgX = cx
     const imgY = cy
 
-    // Circular arrangement — words orbit around center like Rene's layout
-    // Positioned close enough along the arc for domino cascade via collision
-    const orbitR = Math.min(W, H) * 0.30 // orbit radius
-    // Words placed clockwise from top-left, each ~45° apart
-    // Angles (radians): top-left to bottom-right sweep
-    const positions: { a: number; rMul: number }[] = [
-      { a: -2.4, rMul: 1.15 },  // welcome — top-left (pendulum)
-      { a: -1.8, rMul: 1.05 },  // to — upper-left
-      { a: -1.2, rMul: 0.95 },  // the — left
-      { a: -0.5, rMul: 1.10 },  // portfolio — lower-left
-      { a: 0.3,  rMul: 1.00 },  // site — bottom
-      { a: 1.0,  rMul: 0.90 },  // of — lower-right
-      { a: 1.7,  rMul: 1.05 },  // <CN/> — right
-    ]
+    // Organic scattered layout — words placed around sketch like Rene's site
+    // Not a grid, not a column — hand-placed for visual interest
+    const s = Math.min(W, H) * 0.01 // scale unit
 
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      { label: 'welcome',   x: cx + Math.cos(positions[0].a) * orbitR * positions[0].rMul, y: cy + Math.sin(positions[0].a) * orbitR * positions[0].rMul, angle: positions[0].a * 0.12, isLink: false, href: null, fill: textColor },
-      { label: 'to',        x: cx + Math.cos(positions[1].a) * orbitR * positions[1].rMul, y: cy + Math.sin(positions[1].a) * orbitR * positions[1].rMul, angle: positions[1].a * 0.10, isLink: false, href: null, fill: textColor },
-      { label: 'the',       x: cx + Math.cos(positions[2].a) * orbitR * positions[2].rMul, y: cy + Math.sin(positions[2].a) * orbitR * positions[2].rMul, angle: positions[2].a * 0.08, isLink: false, href: null, fill: textColor },
-      { label: 'portfolio', x: cx + Math.cos(positions[3].a) * orbitR * positions[3].rMul, y: cy + Math.sin(positions[3].a) * orbitR * positions[3].rMul, angle: positions[3].a * 0.10, isLink: true, href: '__portfolio__', fill: linkColor },
-      { label: 'site',      x: cx + Math.cos(positions[4].a) * orbitR * positions[4].rMul, y: cy + Math.sin(positions[4].a) * orbitR * positions[4].rMul, angle: positions[4].a * 0.08, isLink: false, href: null, fill: textColor },
-      { label: 'of',        x: cx + Math.cos(positions[5].a) * orbitR * positions[5].rMul, y: cy + Math.sin(positions[5].a) * orbitR * positions[5].rMul, angle: positions[5].a * 0.06, isLink: false, href: null, fill: textColor },
-      { label: '<CN/>',     x: cx + Math.cos(positions[6].a) * orbitR * positions[6].rMul, y: cy + Math.sin(positions[6].a) * orbitR * positions[6].rMul, angle: positions[6].a * 0.05, isLink: false, href: null, fill: linkColor, isBrand: true },
+      // "portfolio" is the link — positioned top-left, becomes the pendulum contact
+      { label: 'portfolio', x: cx - s * 22, y: cy - s * 18, angle: -0.12, isLink: true, href: '__portfolio__', fill: linkColor },
+      // Words scattered organically around the sketch
+      { label: 'welcome',   x: cx + s * 18, y: cy - s * 22, angle: 0.08,  isLink: false, href: null, fill: textColor },
+      { label: 'to',        x: cx - s * 28, y: cy - s * 5,  angle: -0.20, isLink: false, href: null, fill: textColor },
+      { label: 'the',       x: cx + s * 25, y: cy - s * 8,  angle: 0.15,  isLink: false, href: null, fill: textColor },
+      { label: 'site',      x: cx - s * 20, y: cy + s * 12, angle: -0.10, isLink: false, href: null, fill: textColor },
+      { label: 'of',        x: cx + s * 22, y: cy + s * 10, angle: 0.12,  isLink: false, href: null, fill: textColor },
+      { label: '<CN/>',     x: cx + s * 5,  y: cy + s * 22, angle: -0.05, isLink: false, href: null, fill: linkColor, isBrand: true },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
@@ -120,26 +111,29 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       wall(W + WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 3),       // right
     ])
 
-    // Sketch body — participates in physics
-    // Sketch in center of the orbit
+    // Collision layers — text collides with text, sketch separate (drops by proximity)
+    const LAYER_TEXT = 0x0001
+    const LAYER_IMG = 0x0002
+
+    // Sketch body — center, separate collision layer (drops by proximity like Rene)
     const sketchBody = Matter.Bodies.rectangle(cx, cy, imgW * 0.8, imgH * 0.8, {
       restitution: RESTITUTION_IMG,
       friction: FRICTION_IMG,
       frictionAir: AIR_IMG,
-      collisionFilter: { category: 0x0001, mask: 0x0001 },
+      collisionFilter: { category: LAYER_IMG, mask: LAYER_TEXT },
     })
     Matter.Body.setStatic(sketchBody, true)
     ;(sketchBody as any)._isSketch = true
     Matter.Composite.add(engine.world, sketchBody)
 
-    // Text bodies
+    // Text bodies — all collide with each other
     const textBodies = items.map((item) => {
       const b = Matter.Bodies.rectangle(item.x, item.y, item.w, item.h, {
         restitution: RESTITUTION_TEXT,
         friction: FRICTION_TEXT,
         frictionAir: AIR_TEXT,
         angle: item.angle,
-        collisionFilter: { category: 0x0001, mask: 0x0001 },
+        collisionFilter: { category: LAYER_TEXT, mask: LAYER_TEXT },
       })
       ;(b as any)._meta = item
       Matter.Body.setStatic(b, true)
@@ -149,66 +143,63 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
 
     const allBodies = [...textBodies, sketchBody]
     const linkBodies = textBodies.filter((b) => (b as any)._meta.isLink)
+    const wordBodies = textBodies.filter((b) => !(b as any)._meta.isLink)
 
     const drop = (b: Matter.Body) => {
       Matter.Body.setStatic(b, false)
-      Matter.Sleeping.set(b, false)
-      Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0.5 })
+      Matter.Body.setVelocity(b, { x: 0, y: 0 })
       Matter.Body.setAngularVelocity(b, 0)
     }
 
-    // Pendulum cascade — "welcome" swings from top-center on a long rope,
-    // sweeping across the circular layout and knocking words one by one.
-    // Find "welcome" (first text body added)
-    const welcomeBody = allBodies.find(b => !(b as any)._isSketch)!
-    const otherBodies = new Set<Matter.Body>(allBodies.filter(b => b !== welcomeBody))
+    // Rene's approach: topmost link body becomes the pendulum contact.
+    // It pivots from its own top-right corner (length: 0), swings under gravity.
+    const sortedLinks = [...linkBodies].sort((a, b) => a.position.y - b.position.y)
+    const contactBody = sortedLinks[0]
+    const staticBodies = new Set<Matter.Body>([...wordBodies, ...sortedLinks.slice(1)])
 
-    ;(welcomeBody as any)._isActive = true
+    // All link bodies start as "active" — they propagate cascade on collision
+    linkBodies.forEach((b) => { ;(b as any)._isActive = true })
 
-    // Pendulum — "welcome" hangs from top-center, swings through the layout
     setTimeout(() => {
-      Matter.Body.setStatic(welcomeBody, false)
-      Matter.Sleeping.set(welcomeBody, false)
+      Matter.Body.setStatic(contactBody, false)
+      Matter.Body.setVelocity(contactBody, { x: 0, y: 0 })
 
-      // Anchor at top-center of the canvas, long rope so it swings wide
-      const ropeLength = orbitR * 1.8
+      const hx = (contactBody.bounds.max.x - contactBody.bounds.min.x) / 2
+      const hy = (contactBody.bounds.max.y - contactBody.bounds.min.y) / 2
+
+      // Pivot from top-right corner — zero-length constraint, swings naturally
       const pendulum = Matter.Constraint.create({
-        pointA: { x: cx, y: cy - ropeLength - fontSize },
-        bodyB: welcomeBody,
-        stiffness: 0.015,
-        damping: 0.005,
-        length: ropeLength,
+        pointA: { x: contactBody.position.x + hx, y: contactBody.position.y - hy },
+        bodyB: contactBody,
+        pointB: { x: hx, y: -hy },
+        stiffness: 0.02,
+        damping: 0.01,
+        length: 0,
       })
       Matter.Composite.add(engine.world, pendulum)
+      Matter.Body.setVelocity(contactBody, { x: 0, y: 0 })
 
-      // Give it a push to start swinging
-      Matter.Body.setVelocity(welcomeBody, { x: 6, y: 0 })
-
-      // Release pendulum after 5s — word falls freely into remaining items
+      // Release pendulum after 8s — word falls freely
       setTimeout(() => {
         Matter.Composite.remove(engine.world, pendulum)
-      }, 5000)
-    }, 1500)
+        drop(contactBody)
+      }, 8000)
+    }, 1250)
 
-    // Collision cascade — any active body hitting a static body activates it
+    // Collision cascade — active bodies activate static bodies on contact
     Matter.Events.on(engine, 'collisionStart', ({ pairs }) => {
-      for (const { bodyA: a, bodyB: b } of pairs) {
-        // Skip wall collisions
-        if ((a as any)._isWall || (b as any)._isWall) continue
-
-        if ((a as any)._isActive && !a.isStatic && otherBodies.has(b)) {
-          otherBodies.delete(b)
+      pairs.forEach(({ bodyA: a, bodyB: b }) => {
+        if ((a as any)._isActive && !a.isStatic && staticBodies.has(b)) {
+          staticBodies.delete(b)
           ;(b as any)._isActive = true
-          Matter.Body.setStatic(b, false)
-          Matter.Sleeping.set(b, false)
+          drop(b)
         }
-        if ((b as any)._isActive && !b.isStatic && otherBodies.has(a)) {
-          otherBodies.delete(a)
+        if ((b as any)._isActive && !b.isStatic && staticBodies.has(a)) {
+          staticBodies.delete(a)
           ;(a as any)._isActive = true
-          Matter.Body.setStatic(a, false)
-          Matter.Sleeping.set(a, false)
+          drop(a)
         }
-      }
+      })
     })
 
     // Clamp velocity to prevent bodies from escaping
@@ -280,6 +271,19 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.fillStyle = bgColor
       ctx.fillRect(0, 0, W, H)
+
+      // Proximity check — if any moving text body gets close to sketch, drop it (like Rene)
+      if (sketchBody.isStatic) {
+        const threshold = (imgW + Math.max(...items.map(i => i.w))) / 2
+        textBodies.forEach((b) => {
+          if (b.isStatic) return
+          const dx = b.position.x - sketchBody.position.x
+          const dy = b.position.y - sketchBody.position.y
+          if (dx * dx + dy * dy < threshold * threshold) {
+            Matter.Body.setStatic(sketchBody, false)
+          }
+        })
+      }
 
       // Draw sketch
       if (sketch.complete && sketch.naturalWidth > 0) {
