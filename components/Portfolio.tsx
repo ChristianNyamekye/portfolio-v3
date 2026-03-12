@@ -67,7 +67,7 @@ export default function Portfolio() {
   const [showExp, setShowExp] = useState(false)
 
   return (
-    <div className="max-w-2xl mx-auto px-6 h-screen flex flex-col overflow-hidden">
+    <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col">
 
       {/* ── Header ── */}
       <header className="pt-6 pb-0 flex-shrink-0">
