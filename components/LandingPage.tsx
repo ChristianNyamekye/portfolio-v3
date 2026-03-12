@@ -286,38 +286,12 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
         ctx.rotate(body.angle)
 
         if (meta.isBrand) {
-          // Animated <CN/>
-          const pulse = 0.5 + 0.5 * Math.sin(time * 2)
-          ctx.shadowColor = linkColor
-          ctx.shadowBlur = 6 + pulse * 10
-
-          // Brackets in lighter weight
-          ctx.font = `400 ${fontSize}px monospace`
+          // <CN/> — clean monospace, brackets dimmer, no glow effects
           ctx.textAlign = 'center'
           ctx.textBaseline = 'middle'
           ctx.fillStyle = linkColor
-          ctx.globalAlpha = 0.5 + pulse * 0.3
-          
-          const bracketW = ctx.measureText('<').width
-          const cnMeasure = ctx.measureText('CN').width
-          ctx.font = `700 ${fontSize}px monospace`
-          const fullCN = ctx.measureText('CN').width
-          
-          // Draw as one centered string but with style variation
-          ctx.font = `400 ${fontSize}px monospace`
-          ctx.globalAlpha = 0.5 + pulse * 0.3
-          ctx.fillText('<', -meta.w / 2 + bracketW / 2 + 2, 0)
-          
-          ctx.font = `700 ${fontSize}px monospace`
-          ctx.globalAlpha = 0.8 + pulse * 0.2
-          ctx.fillText('CN', -meta.w / 2 + bracketW + fullCN / 2 + 2, 0)
-          
-          ctx.font = `400 ${fontSize}px monospace`
-          ctx.globalAlpha = 0.5 + pulse * 0.3
-          ctx.fillText('/>', -meta.w / 2 + bracketW + fullCN + ctx.measureText('/>').width / 2 + 2, 0)
-          
-          ctx.shadowBlur = 0
-          ctx.globalAlpha = 1
+          ctx.font = `600 ${fontSize}px ${fontFamily}`
+          ctx.fillText('<CN/>', 0, 0)
         } else {
           ctx.font = `600 ${fontSize}px ${fontFamily}`
           ctx.textAlign = 'center'
