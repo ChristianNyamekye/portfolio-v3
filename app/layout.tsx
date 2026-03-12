@@ -27,9 +27,9 @@ export const metadata: Metadata = {
     siteName: 'Christian Nyamekye',
     images: [
       {
-        url: `${meta.url}/og`,
-        width: 1200,
-        height: 630,
+        url: `${meta.url}/og.png`,
+        width: 1536,
+        height: 1024,
         alt: 'Christian Nyamekye — Engineer & Builder',
       },
     ],
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     title: meta.title,
     description: meta.description,
     creator: '@printlnxristian',
-    images: [`${meta.url}/og`],
+    images: [`${meta.url}/og.png`],
   },
   robots: {
     index: true,

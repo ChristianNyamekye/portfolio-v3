@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       url: `${meta.url}/projects/${slug}`,
       type: 'article',
-      images: [{ url: `${meta.url}/og`, width: 1200, height: 630 }],
+      images: [{ url: `${meta.url}/og.png`, width: 1536, height: 1024 }],
     },
     twitter: {
       card: 'summary_large_image',
