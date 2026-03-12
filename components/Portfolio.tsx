@@ -67,7 +67,7 @@ export default function Portfolio() {
   const [showExp, setShowExp] = useState(false)
 
   return (
-    <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col">
+    <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col justify-between">
 
       {/* ── Header ── */}
       <header className="pt-6 pb-0 flex-shrink-0">
@@ -106,7 +106,7 @@ export default function Portfolio() {
       </header>
 
       {/* ── Featured projects — 3 cards ── */}
-      <div className="space-y-3 mt-4 flex-1 flex flex-col justify-center min-h-0">
+      <div className="space-y-3 mt-4">
         {featuredProjects.map((project, i) => (
           <Reveal key={project.id} delay={i * 0.08}>
             <motion.a

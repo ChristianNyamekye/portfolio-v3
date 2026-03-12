@@ -118,8 +118,8 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       wall(W + WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 3),       // right
     ])
 
-    // Everything on same collision layer — sketch is part of the domino chain
-    const sketchBody = Matter.Bodies.rectangle(cx, cy, imgW * 0.8, imgH * 0.8, {
+    // Sketch shifted up so pendulum ("welcome") grazes it on its swing arc
+    const sketchBody = Matter.Bodies.rectangle(cx, cy - g * 0.8, imgW * 0.8, imgH * 0.8, {
       restitution: RESTITUTION_IMG,
       friction: FRICTION_IMG,
       frictionAir: AIR_IMG,
