@@ -76,13 +76,15 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const r = Math.max(imgW, imgH) * 0.9
 
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      { label: 'welcome', x: imgX - r * 1.8, y: imgY - r * 1.2, angle: -0.12, isLink: false, href: null, fill: textColor },
-      { label: 'to', x: imgX - r * 1.5, y: imgY - r * 0.5, angle: -0.20, isLink: false, href: null, fill: textColor },
-      { label: 'the', x: imgX - r * 1.8, y: imgY + r * 0.1, angle: -0.28, isLink: false, href: null, fill: textColor },
-      { label: 'portfolio', x: imgX - r * 1.6, y: imgY + r * 0.7, angle: -0.35, isLink: true, href: '__portfolio__', fill: linkColor },
-      { label: 'site', x: imgX - r * 1.0, y: imgY + r * 1.2, angle: -0.38, isLink: false, href: null, fill: textColor },
-      { label: 'of', x: imgX + r * 0.2, y: imgY + r * 1.3, angle: -0.25, isLink: false, href: null, fill: textColor },
-      { label: '<CN/>', x: imgX + r * 1.0, y: imgY + r * 1.1, angle: -0.15, isLink: false, href: null, fill: linkColor, isBrand: true },
+      // Top — this one swings on a pendulum and knocks the rest
+      { label: 'welcome', x: imgX - r * 1.2, y: imgY - r * 1.6, angle: -0.14, isLink: false, href: null, fill: textColor },
+      // Clustered around the sketch so the cascade works
+      { label: 'to', x: imgX - r * 1.4, y: imgY - r * 0.8, angle: -0.20, isLink: false, href: null, fill: textColor },
+      { label: 'the', x: imgX - r * 1.6, y: imgY - r * 0.1, angle: -0.28, isLink: false, href: null, fill: textColor },
+      { label: 'portfolio', x: imgX - r * 1.3, y: imgY + r * 0.5, angle: -0.32, isLink: true, href: '__portfolio__', fill: linkColor },
+      { label: 'site', x: imgX - r * 0.8, y: imgY + r * 1.0, angle: -0.36, isLink: false, href: null, fill: textColor },
+      { label: 'of', x: imgX + r * 0.1, y: imgY + r * 1.2, angle: -0.22, isLink: false, href: null, fill: textColor },
+      { label: '<CN/>', x: imgX + r * 0.8, y: imgY + r * 0.9, angle: -0.12, isLink: false, href: null, fill: linkColor, isBrand: true },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
@@ -142,17 +144,71 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       Matter.Body.setAngularVelocity(b, 0)
     }
 
-    // After 4 seconds, everything drops with staggered timing
-    // Sorted top-to-bottom so upper items fall first (natural feel)
+    // Rene-style: top word swings on a pendulum, then releases and
+    // knocks into other words via collision cascade.
     const sorted = [...allBodies].sort((a, b) => a.position.y - b.position.y)
+    const topBody = sorted[0]
+    const staticBodies = new Set<Matter.Body>(sorted.slice(1))
 
+    // Mark all bodies so collision cascade can propagate
+    ;(topBody as any)._isActive = true
+
+    // Pendulum — top word starts swinging after 1.2s
     setTimeout(() => {
-      sorted.forEach((body, i) => {
-        setTimeout(() => {
-          drop(body)
-        }, i * 150) // 150ms stagger between each body
+      Matter.Body.setStatic(topBody, false)
+      Matter.Sleeping.set(topBody, false)
+      Matter.Body.setVelocity(topBody, { x: 0, y: 0 })
+
+      const hx = (topBody.bounds.max.x - topBody.bounds.min.x) / 2
+      const hy = (topBody.bounds.max.y - topBody.bounds.min.y) / 2
+
+      const pendulum = Matter.Constraint.create({
+        pointA: { x: topBody.position.x + hx, y: topBody.position.y - hy },
+        bodyB: topBody,
+        pointB: { x: hx, y: -hy },
+        stiffness: 0.02,
+        damping: 0.01,
+        length: 0,
       })
-    }, 2500)
+      Matter.Composite.add(engine.world, pendulum)
+
+      // Release pendulum after 6s — word falls freely
+      setTimeout(() => {
+        Matter.Composite.remove(engine.world, pendulum)
+        Matter.Body.setVelocity(topBody, { x: (Math.random() - 0.5) * 3, y: 1 })
+      }, 6000)
+    }, 1200)
+
+    // Collision cascade — when a moving body hits a static one, the static one drops
+    Matter.Events.on(engine, 'collisionStart', ({ pairs }) => {
+      pairs.forEach(({ bodyA: a, bodyB: b }) => {
+        if ((a as any)._isActive && !a.isStatic && staticBodies.has(b)) {
+          staticBodies.delete(b)
+          ;(b as any)._isActive = true
+          Matter.Body.setStatic(b, false)
+          Matter.Sleeping.set(b, false)
+          Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0.5 })
+        }
+        if ((b as any)._isActive && !b.isStatic && staticBodies.has(a)) {
+          staticBodies.delete(a)
+          ;(a as any)._isActive = true
+          Matter.Body.setStatic(a, false)
+          Matter.Sleeping.set(a, false)
+          Matter.Body.setVelocity(a, { x: (Math.random() - 0.5) * 2, y: 0.5 })
+        }
+      })
+    })
+
+    // Safety net — anything still stuck after 15s drops
+    setTimeout(() => {
+      staticBodies.forEach((b) => {
+        staticBodies.delete(b)
+        ;(b as any)._isActive = true
+        Matter.Body.setStatic(b, false)
+        Matter.Sleeping.set(b, false)
+        Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0.5 })
+      })
+    }, 15000)
 
     // Clamp velocity to prevent bodies from escaping
     Matter.Events.on(engine, 'beforeUpdate', () => {
