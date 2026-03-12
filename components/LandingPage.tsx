@@ -12,7 +12,7 @@ const FRICTION_TEXT = 0.007
 const FRICTION_IMG = 0.05
 const AIR_TEXT = 0.001
 const AIR_IMG = 0.01
-const WALL_THICKNESS = 50
+const WALL_THICKNESS = 100 // Thicker walls to prevent escape
 
 interface TextItem {
   label: string
@@ -24,6 +24,7 @@ interface TextItem {
   isLink: boolean
   href: string | null
   fill: string
+  isBrand?: boolean
 }
 
 export default function LandingPage({ onEnter }: { onEnter: () => void }) {
@@ -52,11 +53,12 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const textColor = isDark ? '#e8e6e3' : '#000000'
     const linkColor = isDark ? '#5b8def' : '#2563eb'
 
-    // Font — scale with viewport, mobile-friendly
-    const baseFontSize = W < 600 ? 22 : W < 900 ? 26 : 28
-    const fontSize = Math.round(baseFontSize * Math.min(W / 1400, 1.2))
+    // Font — Sentient to match portfolio, scale with viewport
+    const baseFontSize = W < 600 ? 18 : W < 900 ? 22 : 26
+    const fontSize = Math.round(baseFontSize)
+    const fontFamily = 'Sentient, Georgia, serif'
     const measure = document.createElement('canvas').getContext('2d')!
-    measure.font = `700 ${fontSize}px Helvetica, Arial, sans-serif`
+    measure.font = `600 ${fontSize}px ${fontFamily}`
 
     const cx = W / 2
     const cy = H / 2
@@ -64,23 +66,33 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     // Load sketch (transparent PNG)
     const sketch = new Image()
     sketch.src = '/sketch.png'
-    const imgW = W < 600 ? Math.min(160, W * 0.4) : Math.min(240, W * 0.25)
-    const imgH = imgW
+    const imgW = W < 600 ? Math.min(140, W * 0.35) : Math.min(200, W * 0.2)
+    const imgH = imgW * 1.2 // Slightly taller than wide for a seated figure
+    const imgX = cx
+    const imgY = cy
 
-    // Text items: "WELCOME TO <CN/>'s PORTFOLIO SITE"
-    // <CN/> gets special rendering (accent color, animated)
-    const spacing = fontSize * 1.8
+    // "welcome to the portfolio site of CN"
+    // Arranged in an arc AROUND the sketch — left side going down, right side going up
+    const r = Math.max(imgW, imgH) * 0.9 // radius from center of sketch
+
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      { label: 'WELCOME', x: cx - spacing * 1.5, y: cy - spacing * 1.8, angle: -0.10, isLink: false, href: null, fill: textColor },
-      { label: 'TO', x: cx - spacing * 0.5, y: cy - spacing * 1.2, angle: -0.18, isLink: false, href: null, fill: textColor },
-      { label: '<CN/>', x: cx + spacing * 0.3, y: cy - spacing * 0.5, angle: -0.08, isLink: false, href: null, fill: linkColor },
-      { label: 'PORTFOLIO', x: cx - spacing * 0.2, y: cy + spacing * 0.3, angle: -0.25, isLink: true, href: '__portfolio__', fill: linkColor },
-      { label: 'SITE', x: cx + spacing * 0.8, y: cy + spacing * 1, angle: -0.15, isLink: false, href: null, fill: textColor },
+      // Upper left arc
+      { label: 'welcome', x: imgX - r * 1.8, y: imgY - r * 1.2, angle: -0.15, isLink: false, href: null, fill: textColor },
+      { label: 'to the', x: imgX - r * 1.4, y: imgY - r * 0.5, angle: -0.25, isLink: false, href: null, fill: textColor },
+      // Left side
+      { label: 'portfolio', x: imgX - r * 1.6, y: imgY + r * 0.2, angle: -0.35, isLink: true, href: '__portfolio__', fill: linkColor },
+      // Bottom left
+      { label: 'site', x: imgX - r * 1.2, y: imgY + r * 0.9, angle: -0.40, isLink: false, href: null, fill: textColor },
+      // Bottom
+      { label: 'of', x: imgX - r * 0.3, y: imgY + r * 1.2, angle: -0.30, isLink: false, href: null, fill: textColor },
+      // Bottom right — the brand
+      { label: '<CN/>', x: imgX + r * 0.6, y: imgY + r * 1.0, angle: -0.20, isLink: false, href: null, fill: linkColor, isBrand: true },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
+      measure.font = item.isBrand ? `400 ${fontSize}px monospace` : `600 ${fontSize}px ${fontFamily}`
       const tw = measure.measureText(item.label).width
-      return { ...item, w: Math.max(tw, 20), h: Math.max(fontSize, 20) }
+      return { ...item, w: Math.max(tw + 10, 20), h: Math.max(fontSize + 6, 20) }
     })
 
     // Engine
@@ -88,18 +100,18 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const runner = Matter.Runner.create()
     Matter.Runner.run(runner, engine)
 
-    // Walls
+    // Walls — extra thick + ceiling to prevent escape
     const wall = (x: number, y: number, w: number, h: number) =>
-      Matter.Bodies.rectangle(x, y, w, h, { isStatic: true })
+      Matter.Bodies.rectangle(x, y, w, h, { isStatic: true, restitution: 0.5 })
     Matter.Composite.add(engine.world, [
-      wall(W / 2, H + WALL_THICKNESS / 2, W * 2, WALL_THICKNESS),
-      wall(W / 2, -WALL_THICKNESS / 2, W * 2, WALL_THICKNESS),
-      wall(-WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 2),
-      wall(W + WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 2),
+      wall(W / 2, H + WALL_THICKNESS / 2, W * 3, WALL_THICKNESS),       // floor
+      wall(W / 2, -WALL_THICKNESS / 2, W * 3, WALL_THICKNESS),          // ceiling
+      wall(-WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 3),          // left
+      wall(W + WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 3),       // right
     ])
 
-    // Sketch body — participates in physics (falls too)
-    const sketchBody = Matter.Bodies.rectangle(cx, cy + spacing * 1.5, imgW, imgH, {
+    // Sketch body — participates in physics
+    const sketchBody = Matter.Bodies.rectangle(imgX, imgY, imgW * 0.8, imgH * 0.8, {
       restitution: RESTITUTION_IMG,
       friction: FRICTION_IMG,
       frictionAir: AIR_IMG,
@@ -124,22 +136,20 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     })
     Matter.Composite.add(engine.world, textBodies)
 
-    // All physics bodies (text + sketch)
     const allBodies = [...textBodies, sketchBody]
     const linkBodies = textBodies.filter((b) => (b as any)._meta.isLink)
 
     const drop = (b: Matter.Body) => {
       Matter.Body.setStatic(b, false)
-      Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 0 })
+      Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0 })
       Matter.Body.setAngularVelocity(b, 0)
     }
 
-    // Cascade — top element drops first, collisions activate the rest
+    // Cascade
     const sorted = [...allBodies].sort((a, b) => a.position.y - b.position.y)
     const topBody = sorted[0]
     const staticBodies = new Set<Matter.Body>(sorted.slice(1))
     ;(topBody as any)._isActive = true
-    // Mark all link bodies as active so they can trigger cascades
     linkBodies.forEach((b) => { (b as any)._isActive = true })
 
     // Pendulum for top body
@@ -182,6 +192,25 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       })
     })
 
+    // Clamp velocity to prevent bodies from escaping
+    Matter.Events.on(engine, 'beforeUpdate', () => {
+      const maxSpeed = 15
+      allBodies.forEach((b) => {
+        if (b.isStatic) return
+        const v = b.velocity
+        const speed = Math.sqrt(v.x * v.x + v.y * v.y)
+        if (speed > maxSpeed) {
+          const scale = maxSpeed / speed
+          Matter.Body.setVelocity(b, { x: v.x * scale, y: v.y * scale })
+        }
+        // Force back if somehow escaped
+        if (b.position.x < -20) Matter.Body.setPosition(b, { x: 50, y: b.position.y })
+        if (b.position.x > W + 20) Matter.Body.setPosition(b, { x: W - 50, y: b.position.y })
+        if (b.position.y < -20) Matter.Body.setPosition(b, { x: b.position.x, y: 50 })
+        if (b.position.y > H + 20) Matter.Body.setPosition(b, { x: b.position.x, y: H - 50 })
+      })
+    })
+
     // Mouse drag
     const mouse = Matter.Mouse.create(canvas)
     mouse.pixelRatio = dpr
@@ -204,9 +233,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       return Math.abs(lx) < meta.w / 2 + 5 && Math.abs(ly) < meta.h / 2 + 5
     }
 
-    canvas.addEventListener('mousedown', (e) => {
-      mouseDownPos = { x: e.clientX, y: e.clientY }
-    })
+    canvas.addEventListener('mousedown', (e) => { mouseDownPos = { x: e.clientX, y: e.clientY } })
     canvas.addEventListener('click', (e) => {
       const dx = e.clientX - mouseDownPos.x
       const dy = e.clientY - mouseDownPos.y
@@ -218,8 +245,6 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       const hit = linkBodies.find((b) => hitTest(b, e.clientX, e.clientY))
       canvas.style.cursor = hit ? 'pointer' : 'default'
     })
-
-    // Touch support for mobile
     canvas.addEventListener('touchend', (e) => {
       const touch = e.changedTouches[0]
       if (!touch) return
@@ -227,9 +252,9 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       if (hit) onEnter()
     })
 
-    // Render loop
-    const underlineH = fontSize * 0.1
-    const underlineY = fontSize * 0.45
+    // Render
+    const underlineH = Math.max(fontSize * 0.08, 1.5)
+    const underlineY = fontSize * 0.4
 
     let raf = 0
     const loop = () => {
@@ -237,7 +262,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       ctx.fillStyle = bgColor
       ctx.fillRect(0, 0, W, H)
 
-      // Draw sketch (with physics)
+      // Draw sketch
       if (sketch.complete && sketch.naturalWidth > 0) {
         ctx.save()
         ctx.translate(sketchBody.position.x, sketchBody.position.y)
@@ -247,10 +272,6 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       }
 
       // Draw text
-      ctx.font = `700 ${fontSize}px Helvetica, Arial, sans-serif`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-
       const time = performance.now() / 1000
 
       textBodies.forEach((body) => {
@@ -259,38 +280,43 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
         ctx.translate(body.position.x, body.position.y)
         ctx.rotate(body.angle)
 
-        if (meta.label === '<CN/>') {
-          // Animated glow for <CN/>
+        if (meta.isBrand) {
+          // Animated <CN/>
           const pulse = 0.5 + 0.5 * Math.sin(time * 2)
-          const glowAlpha = 0.15 + pulse * 0.15
           ctx.shadowColor = linkColor
-          ctx.shadowBlur = 8 + pulse * 12
-          ctx.globalAlpha = 0.7 + pulse * 0.3
-          ctx.fillStyle = linkColor
-          // Draw brackets slightly dimmer
-          const bracketW = measure.measureText('<').width
-          const slashW = measure.measureText('/').width
-          const cnW = measure.measureText('CN').width
-          const gtW = measure.measureText('>').width
-          const totalW = meta.w
-          const startX = -totalW / 2
+          ctx.shadowBlur = 6 + pulse * 10
 
-          ctx.font = `400 ${fontSize}px Helvetica, Arial, sans-serif`
+          // Brackets in lighter weight
+          ctx.font = `400 ${fontSize}px monospace`
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillStyle = linkColor
           ctx.globalAlpha = 0.5 + pulse * 0.3
-          ctx.textAlign = 'left'
-          ctx.fillText('<', startX, 0)
           
-          ctx.font = `700 ${fontSize}px Helvetica, Arial, sans-serif`
+          const bracketW = ctx.measureText('<').width
+          const cnMeasure = ctx.measureText('CN').width
+          ctx.font = `700 ${fontSize}px monospace`
+          const fullCN = ctx.measureText('CN').width
+          
+          // Draw as one centered string but with style variation
+          ctx.font = `400 ${fontSize}px monospace`
+          ctx.globalAlpha = 0.5 + pulse * 0.3
+          ctx.fillText('<', -meta.w / 2 + bracketW / 2 + 2, 0)
+          
+          ctx.font = `700 ${fontSize}px monospace`
           ctx.globalAlpha = 0.8 + pulse * 0.2
-          ctx.fillText('CN', startX + bracketW, 0)
+          ctx.fillText('CN', -meta.w / 2 + bracketW + fullCN / 2 + 2, 0)
           
-          ctx.font = `400 ${fontSize}px Helvetica, Arial, sans-serif`
+          ctx.font = `400 ${fontSize}px monospace`
           ctx.globalAlpha = 0.5 + pulse * 0.3
-          ctx.fillText('/>', startX + bracketW + cnW, 0)
+          ctx.fillText('/>', -meta.w / 2 + bracketW + fullCN + ctx.measureText('/>').width / 2 + 2, 0)
           
           ctx.shadowBlur = 0
           ctx.globalAlpha = 1
         } else {
+          ctx.font = `600 ${fontSize}px ${fontFamily}`
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
           ctx.fillStyle = meta.fill
           ctx.fillText(meta.label, 0, 0)
           if (meta.isLink) {
@@ -304,7 +330,6 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     }
     raf = requestAnimationFrame(loop)
 
-    // Resize
     const onResize = () => {
       canvas.width = window.innerWidth * dpr
       canvas.height = window.innerHeight * dpr
@@ -323,11 +348,11 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
   }, [onEnter])
 
   useEffect(() => {
-    const timer = setTimeout(setup, 200)
-    return () => {
-      clearTimeout(timer)
-      cleanupRef.current?.()
-    }
+    // Wait for font to load
+    document.fonts.ready.then(() => {
+      setTimeout(setup, 100)
+    })
+    return () => { cleanupRef.current?.() }
   }, [setup])
 
   return (
