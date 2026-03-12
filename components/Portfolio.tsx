@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
@@ -15,7 +15,7 @@ import {
 
 
 
-/* ─── Fade-in ──────────────────────────────────────────── */
+/* Fade-in */
 function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
@@ -32,7 +32,7 @@ function Reveal({ children, className = '', delay = 0 }: { children: React.React
   )
 }
 
-/* ─── Social pill ──────────────────────────────────────── */
+/* Social pill */
 function Pill({ href, label }: { href: string; label: string }) {
   return (
     <motion.a
@@ -50,7 +50,7 @@ function Pill({ href, label }: { href: string; label: string }) {
 /* Short descriptions for main page cards */
 const shortDescriptions: Record<string, string> = {
   flexa: 'Rebuilding the economics of robotics training data. iPhone + Apple Watch capture for $950, replacing $8,700+ motion capture rigs.',
-  garb: 'Real-time gaze tracking that adapts the browser reading environment — dynamic line highlighting, distraction removal, and comprehension nudges.',
+  garb: 'Real-time gaze tracking that adapts the browser reading environment â€" dynamic line highlighting, distraction removal, and comprehension nudges.',
   quadsense: 'Voice-controlled autonomy platform for Boston Dynamics Spot, built on NVIDIA Jetson AGX Orin with real-time speech, vision, and navigation.',
 }
 
@@ -60,7 +60,7 @@ const categories: Record<string, string> = {
   quadsense: 'Autonomous Systems',
 }
 
-/* ─── Main ─────────────────────────────────────────────── */
+/* Main */
 export default function Portfolio() {
   const [showNotable, setShowNotable] = useState(false)
   const [showArchive, setShowArchive] = useState(false)
@@ -69,8 +69,8 @@ export default function Portfolio() {
   return (
     <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col">
 
-      {/* ── Header ── */}
-      <header className="pt-6 pb-0 flex-shrink-0">
+      
+      <header className="pt-8 pb-0 flex-shrink-0">
         <Reveal>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--surface)]">
@@ -82,7 +82,7 @@ export default function Portfolio() {
             </div>
             <div>
               <h1 className="text-sm font-medium tracking-tight">Christian Nyamekye</h1>
-              <span className="text-[11px] text-[var(--muted)] italic"> — {hero.eyebrow}</span>
+              <span className="text-[11px] text-[var(--muted)] italic"> â€" {hero.eyebrow}</span>
             </div>
           </div>
         </Reveal>
@@ -105,8 +105,8 @@ export default function Portfolio() {
         </Reveal>
       </header>
 
-      {/* ── Featured projects — 3 cards ── */}
-      <div className="space-y-3 mt-4">
+      
+      <div className="space-y-3 mt-6 flex-1">
         {featuredProjects.map((project, i) => (
           <Reveal key={project.id} delay={i * 0.08}>
             <motion.a
@@ -137,8 +137,8 @@ export default function Portfolio() {
         ))}
       </div>
 
-      {/* ── Notable projects (collapsible) ── */}
-      <div className="mt-2 flex-shrink-0">
+      
+      <div className="mt-6 flex-shrink-0">
         <button
           onClick={() => setShowNotable(!showNotable)}
           className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5"
@@ -147,7 +147,7 @@ export default function Portfolio() {
           <ChevronDown size={12} className={`transition-transform duration-200 ${showNotable ? 'rotate-180' : ''}`} />
         </button>
         <div
-          className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+          className="grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
           style={{ gridTemplateRows: showNotable ? '1fr' : '0fr' }}
         >
           <div className="overflow-hidden">
@@ -177,7 +177,7 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* ── Experience (collapsible) ── */}
+      
       <div className="mt-3">
         <button
           onClick={() => setShowExp(!showExp)}
@@ -187,7 +187,7 @@ export default function Portfolio() {
           <ChevronDown size={12} className={`transition-transform duration-200 ${showExp ? 'rotate-180' : ''}`} />
         </button>
         <div
-          className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+          className="grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
           style={{ gridTemplateRows: showExp ? '1fr' : '0fr' }}
         >
           <div className="overflow-hidden">
@@ -210,7 +210,7 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* ── Archive ── */}
+      
       <div className="mt-3">
         <button
           onClick={() => setShowArchive(!showArchive)}
@@ -220,7 +220,7 @@ export default function Portfolio() {
           <ChevronDown size={11} className={`transition-transform duration-200 ${showArchive ? 'rotate-180' : ''}`} />
         </button>
         <div
-          className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+          className="grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
           style={{ gridTemplateRows: showArchive ? '1fr' : '0fr' }}
         >
           <div className="overflow-hidden">
@@ -239,9 +239,9 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* ── Footer ── */}
-      <footer className="mt-3 pb-4 text-xs text-[var(--muted)] flex items-center justify-between flex-shrink-0">
-        <p>Dartmouth &apos;26 · EE & CS</p>
+      {/* Footer */}
+      <footer className="mt-auto pt-6 pb-6 text-xs text-[var(--muted)] flex items-center justify-between flex-shrink-0">
+        <p>Dartmouth &apos;26 · EE &amp; CS</p>
         <a href={`mailto:${meta.email}`} className="hover:text-[var(--text)] transition-colors">{meta.email}</a>
       </footer>
     </div>
