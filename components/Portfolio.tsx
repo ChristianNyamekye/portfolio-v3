@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
@@ -12,8 +12,6 @@ import {
   experience,
   asset,
 } from '@/lib/data'
-
-
 
 /* Fade-in */
 function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -47,10 +45,50 @@ function Pill({ href, label }: { href: string; label: string }) {
   )
 }
 
-/* Short descriptions for main page cards */
+/* Collapsible section - uses details/summary for native smooth behavior */
+function Collapsible({ label, count, children }: { label: string; count: number; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [height, setHeight] = useState(0)
+
+  const toggle = () => {
+    if (!open && contentRef.current) {
+      setHeight(contentRef.current.scrollHeight)
+    }
+    setOpen(!open)
+  }
+
+  return (
+    <div>
+      <button
+        onClick={toggle}
+        className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors duration-200 flex items-center gap-1.5"
+      >
+        {label} ({count})
+        <ChevronDown
+          size={12}
+          className="transition-transform duration-300 ease-out"
+          style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        />
+      </button>
+      <div
+        className="overflow-hidden transition-[max-height,opacity] duration-[500ms] ease-[cubic-bezier(0.33,1,0.68,1)]"
+        style={{
+          maxHeight: open ? `${height}px` : '0px',
+          opacity: open ? 1 : 0,
+        }}
+      >
+        <div ref={contentRef}>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const shortDescriptions: Record<string, string> = {
   flexa: 'Rebuilding the economics of robotics training data. iPhone + Apple Watch capture for $950, replacing $8,700+ motion capture rigs.',
-  garb: 'Real-time gaze tracking that adapts the browser reading environment â€" dynamic line highlighting, distraction removal, and comprehension nudges.',
+  garb: 'Real-time gaze tracking that adapts the browser reading environment \u2014 dynamic line highlighting, distraction removal, and comprehension nudges.',
   quadsense: 'Voice-controlled autonomy platform for Boston Dynamics Spot, built on NVIDIA Jetson AGX Orin with real-time speech, vision, and navigation.',
 }
 
@@ -60,16 +98,11 @@ const categories: Record<string, string> = {
   quadsense: 'Autonomous Systems',
 }
 
-/* Main */
 export default function Portfolio() {
-  const [showNotable, setShowNotable] = useState(false)
-  const [showArchive, setShowArchive] = useState(false)
-  const [showExp, setShowExp] = useState(false)
-
   return (
-    <div className="max-w-2xl mx-auto px-6">
+    <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col">
 
-      
+      {/* Header */}
       <header className="pt-8 pb-0">
         <Reveal>
           <div className="flex items-center gap-3 mb-2">
@@ -82,12 +115,11 @@ export default function Portfolio() {
             </div>
             <div>
               <h1 className="text-sm font-medium tracking-tight">Christian Nyamekye</h1>
-              <span className="text-[11px] text-[var(--muted)] italic"> â€" {hero.eyebrow}</span>
+              <span className="text-[11px] text-[var(--muted)] italic"> &mdash; {hero.eyebrow}</span>
             </div>
           </div>
         </Reveal>
 
-        {/* One-liner */}
         <Reveal delay={0.05}>
           <p className="text-sm text-[var(--dim)] mt-3 mb-3">
             hardware, software, and the messy parts in between.
@@ -105,7 +137,7 @@ export default function Portfolio() {
         </Reveal>
       </header>
 
-      
+      {/* Featured projects */}
       <div className="space-y-3 mt-6">
         {featuredProjects.map((project, i) => (
           <Reveal key={project.id} delay={i * 0.08}>
@@ -115,19 +147,15 @@ export default function Portfolio() {
               whileTap={{ scale: 0.99 }}
               className="block bg-[var(--surface)] rounded-2xl p-5 md:p-6 transition-shadow duration-300 hover:shadow-lg hover:shadow-black/5"
             >
-              {/* Category tag */}
               <div className="flex justify-end mb-2">
                 <span className="text-[11px] text-[var(--muted)] border border-[var(--border)] rounded-full px-3 py-0.5">
                   {categories[project.id] || project.status}
                 </span>
               </div>
-
               <h2 className="text-base font-semibold tracking-tight mb-1.5">{project.name}</h2>
-
               <p className="text-sm text-[var(--dim)] leading-relaxed mb-2">
                 {shortDescriptions[project.id] || project.description}
               </p>
-
               <span className="inline-flex items-center gap-1 text-xs text-[var(--accent)] group/link">
                 <ChevronRight size={13} className="transition-transform duration-200 group-hover/link:translate-x-0.5" />
                 Learn more
@@ -137,111 +165,69 @@ export default function Portfolio() {
         ))}
       </div>
 
-      
-      <div className="mt-4">
-        <button
-          onClick={() => setShowNotable(!showNotable)}
-          className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5"
-        >
-          Notable Projects ({notableProjects.length})
-          <ChevronDown size={12} className={`transition-transform duration-200 ${showNotable ? 'rotate-180' : ''}`} />
-        </button>
-        <div
-          className="grid transition-[grid-template-rows] duration-[600ms] ease-[cubic-bezier(0.33,1,0.68,1)]"
-          style={{ gridTemplateRows: showNotable ? '1fr' : '0fr' }}
-        >
-          <div className="overflow-hidden">
-            <div className="mt-3 space-y-4 pb-1">
-              {notableProjects.map((p) => (
-                <div key={p.name} className="flex items-start justify-between gap-3 py-2 border-b border-[var(--border)] last:border-0">
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-medium text-[var(--text)] mb-0.5">{p.name}</h3>
-                    <p className="text-xs text-[var(--muted)] leading-relaxed">{p.description}</p>
-                  </div>
-                  <div className="flex gap-2 shrink-0 pt-1">
-                    {p.github && (
-                      <a href={p.github} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors">
-                        <Github size={13} />
-                      </a>
-                    )}
-                    {p.link && (
-                      <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors">
-                        <ExternalLink size={13} />
-                      </a>
-                    )}
-                  </div>
+      {/* Collapsible sections */}
+      <div className="mt-6 space-y-3">
+        <Collapsible label="Notable Projects" count={notableProjects.length}>
+          <div className="mt-3 space-y-4 pb-2">
+            {notableProjects.map((p) => (
+              <div key={p.name} className="flex items-start justify-between gap-3 py-2 border-b border-[var(--border)] last:border-0">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-medium text-[var(--text)] mb-0.5">{p.name}</h3>
+                  <p className="text-xs text-[var(--muted)] leading-relaxed">{p.description}</p>
                 </div>
-              ))}
-            </div>
+                <div className="flex gap-2 shrink-0 pt-1">
+                  {p.github && (
+                    <a href={p.github} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors">
+                      <Github size={13} />
+                    </a>
+                  )}
+                  {p.link && (
+                    <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors">
+                      <ExternalLink size={13} />
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        </Collapsible>
+
+        <Collapsible label="Experience" count={experience.length}>
+          <div className="mt-3 space-y-4 pb-2">
+            {experience.map((exp) => (
+              <div key={`${exp.org}-${exp.role}`} className="py-2 border-b border-[var(--border)] last:border-0">
+                <div className="flex items-baseline justify-between gap-3 mb-0.5">
+                  <span className="text-sm font-medium text-[var(--text)]">
+                    {exp.link ? (
+                      <a href={exp.link} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent)] transition-colors">{exp.org}</a>
+                    ) : exp.org}
+                  </span>
+                  <span className="text-[10px] font-mono text-[var(--muted)] shrink-0">{exp.period}</span>
+                </div>
+                <p className="text-xs text-[var(--dim)]">{exp.role}</p>
+              </div>
+            ))}
+          </div>
+        </Collapsible>
+
+        <Collapsible label="Archive" count={otherProjects.length}>
+          <div className="mt-3 space-y-3 pb-2">
+            {otherProjects.map((p) => (
+              <div key={p.name} className="flex items-baseline justify-between gap-3 py-1">
+                <span className="text-xs text-[var(--text)]">{p.name}</span>
+                <div className="flex gap-2 shrink-0">
+                  {p.github && <a href={p.github} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors"><Github size={11} /></a>}
+                  {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors"><ExternalLink size={11} /></a>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Collapsible>
       </div>
 
-      
-      <div className="mt-3">
-        <button
-          onClick={() => setShowExp(!showExp)}
-          className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5"
-        >
-          Experience ({experience.length})
-          <ChevronDown size={12} className={`transition-transform duration-200 ${showExp ? 'rotate-180' : ''}`} />
-        </button>
-        <div
-          className="grid transition-[grid-template-rows] duration-[600ms] ease-[cubic-bezier(0.33,1,0.68,1)]"
-          style={{ gridTemplateRows: showExp ? '1fr' : '0fr' }}
-        >
-          <div className="overflow-hidden">
-            <div className="mt-3 space-y-4 pb-1">
-              {experience.map((exp) => (
-                <div key={`${exp.org}-${exp.role}`} className="py-2 border-b border-[var(--border)] last:border-0">
-                  <div className="flex items-baseline justify-between gap-3 mb-0.5">
-                    <span className="text-sm font-medium text-[var(--text)]">
-                      {exp.link ? (
-                        <a href={exp.link} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent)] transition-colors">{exp.org}</a>
-                      ) : exp.org}
-                    </span>
-                    <span className="text-[10px] font-mono text-[var(--muted)] shrink-0">{exp.period}</span>
-                  </div>
-                  <p className="text-xs text-[var(--dim)]">{exp.role}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      
-      <div className="mt-3">
-        <button
-          onClick={() => setShowArchive(!showArchive)}
-          className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5"
-        >
-          Archive ({otherProjects.length})
-          <ChevronDown size={11} className={`transition-transform duration-200 ${showArchive ? 'rotate-180' : ''}`} />
-        </button>
-        <div
-          className="grid transition-[grid-template-rows] duration-[600ms] ease-[cubic-bezier(0.33,1,0.68,1)]"
-          style={{ gridTemplateRows: showArchive ? '1fr' : '0fr' }}
-        >
-          <div className="overflow-hidden">
-            <div className="mt-3 space-y-3 pb-1">
-              {otherProjects.map((p) => (
-                <div key={p.name} className="flex items-baseline justify-between gap-3 py-1">
-                  <span className="text-xs text-[var(--text)]">{p.name}</span>
-                  <div className="flex gap-2 shrink-0">
-                    {p.github && <a href={p.github} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors"><Github size={11} /></a>}
-                    {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-[var(--muted)] hover:text-[var(--text)] transition-colors"><ExternalLink size={11} /></a>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="mt-8 pb-6 text-xs text-[var(--muted)] flex items-center justify-between">
-        <p>Dartmouth &apos;26 · EE &amp; CS</p>
+      {/* Footer - pushed to bottom */}
+      <footer className="mt-auto pt-8 pb-6 text-xs text-[var(--muted)] flex items-center justify-between">
+        <p>Dartmouth &apos;26 &middot; EE &amp; CS</p>
         <a href={`mailto:${meta.email}`} className="hover:text-[var(--text)] transition-colors">{meta.email}</a>
       </footer>
     </div>
