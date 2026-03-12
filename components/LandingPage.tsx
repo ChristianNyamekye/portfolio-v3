@@ -29,7 +29,6 @@ interface TextItem {
 
 export default function LandingPage({ onEnter }: { onEnter: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const engineRef = useRef<Matter.Engine | null>(null)
   const cleanupRef = useRef<(() => void) | null>(null)
 
   const setup = useCallback(() => {
@@ -53,54 +52,49 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const bgColor = isDark ? '#111111' : '#f7f5f2'
     const textColor = isDark ? '#e8e6e3' : '#000000'
     const linkColor = isDark ? '#5b8def' : '#2563eb'
-    const mutedColor = isDark ? '#6b6b6b' : '#8a8a8a'
 
-    // Measure text
-    const measure = document.createElement('canvas').getContext('2d')!
+    // Font sizing — scale with viewport
     const fontSize = Math.round(FONT_SIZE * Math.min(W / 1400, 1))
-    const smallSize = Math.round(fontSize * 0.5)
-    measure.font = `500 ${fontSize}px Sentient, Georgia, serif`
+    const measure = document.createElement('canvas').getContext('2d')!
+    measure.font = `700 ${fontSize}px Helvetica, Arial, sans-serif`
 
-    // Layout — text items positioned relative to center
+    // Center point
     const cx = W / 2
     const cy = H / 2
 
-    // Load headshot
-    const headshot = new Image()
-    headshot.src = '/headshot.jpg'
-    const imgW = Math.min(180, W * 0.25)
+    // Load sketch
+    const sketch = new Image()
+    sketch.src = '/sketch.png'
+    const imgW = Math.min(280, W * 0.35)
     const imgH = imgW
     const imgX = cx
-    const imgY = cy + fontSize * 2.5
+    const imgY = cy + fontSize * 2
 
+    // Text items — arranged in an arc around the sketch
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      // Bio text — arranged in an arc like Rene
-      { label: 'CHRISTIAN', x: cx - fontSize * 5, y: cy + fontSize * 2, angle: -0.18, isLink: false, href: null, fill: textColor },
-      { label: 'NYAMEKYE', x: cx - fontSize * 3.2, y: cy + fontSize * 1.2, angle: -0.38, isLink: false, href: null, fill: textColor },
-      { label: 'IS AN', x: cx - fontSize * 1.8, y: cy + fontSize * 1.8, angle: -0.43, isLink: false, href: null, fill: textColor },
+      // Bio words curving around the sketch
+      { label: 'CHRISTIAN', x: cx - fontSize * 5.5, y: cy + fontSize * 2.2, angle: -0.18, isLink: false, href: null, fill: textColor },
+      { label: 'NYAMEKYE', x: cx - fontSize * 3.5, y: cy + fontSize * 1.2, angle: -0.38, isLink: false, href: null, fill: textColor },
+      { label: 'IS AN', x: cx - fontSize * 2, y: cy + fontSize * 2, angle: -0.43, isLink: false, href: null, fill: textColor },
       { label: 'ENGINEER', x: cx - fontSize * 0.5, y: cy + fontSize * 0.5, angle: -0.66, isLink: false, href: null, fill: textColor },
       { label: '& BUILDER', x: cx + fontSize * 3, y: cy - fontSize * 0.8, angle: -0.46, isLink: false, href: null, fill: textColor },
       { label: 'BASED IN', x: cx + fontSize * 5, y: cy - fontSize * 0.2, angle: -0.27, isLink: false, href: null, fill: textColor },
       { label: 'NEW YORK.', x: cx + fontSize * 7, y: cy - fontSize * 0.5, angle: -0.11, isLink: false, href: null, fill: textColor },
 
-      // Links — stacked above, slightly rotated
-      { label: 'CONTACT', x: cx + fontSize * 1, y: cy - fontSize * 5.5, angle: -0.14, isLink: true, href: 'mailto:christian.k.nyamekye.26@dartmouth.edu', fill: linkColor },
-      { label: 'PORTFOLIO', x: cx + fontSize * 0.5, y: cy - fontSize * 4, angle: -0.30, isLink: true, href: '__portfolio__', fill: linkColor },
-      { label: 'GITHUB', x: cx - fontSize * 1, y: cy - fontSize * 2.5, angle: -0.03, isLink: true, href: 'https://github.com/ChristianNyamekye', fill: linkColor },
-      { label: 'LINKEDIN', x: cx - fontSize * 2, y: cy - fontSize * 1.5, angle: 0.09, isLink: true, href: 'https://linkedin.com/in/christiannyamekye', fill: linkColor },
-      { label: 'RESUME', x: cx - fontSize * 3.5, y: cy - fontSize * 0.5, angle: -0.10, isLink: true, href: 'https://docs.google.com/document/d/1baFxz880bwpHy8L0S91R3N1W0Ou0C3GJbxlDbjYw9Yo/edit?tab=t.0', fill: linkColor },
+      // "welcome to my" as plain text, "portfolio site" as link
+      { label: 'WELCOME', x: cx - fontSize * 1.5, y: cy - fontSize * 5, angle: -0.08, isLink: false, href: null, fill: textColor },
+      { label: 'TO MY', x: cx - fontSize * 0.5, y: cy - fontSize * 4, angle: -0.15, isLink: false, href: null, fill: textColor },
+      { label: 'PORTFOLIO SITE', x: cx + fontSize * 1.5, y: cy - fontSize * 3, angle: -0.22, isLink: true, href: '__portfolio__', fill: linkColor },
     ]
 
     // Measure widths
     const items: TextItem[] = rawItems.map((item) => {
-      measure.font = `700 ${fontSize}px Helvetica, Arial, sans-serif`
       const tw = measure.measureText(item.label).width
       return { ...item, w: Math.max(tw, 20), h: Math.max(fontSize, 20) }
     })
 
     // Engine
     const engine = Matter.Engine.create({ gravity: { y: GRAVITY } })
-    engineRef.current = engine
     const runner = Matter.Runner.create()
     Matter.Runner.run(runner, engine)
 
@@ -114,15 +108,15 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       wall(W + WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 2),
     ])
 
-    // Photo body
-    const photoBody = Matter.Bodies.rectangle(imgX, imgY, imgW, imgH, {
+    // Sketch body
+    const sketchBody = Matter.Bodies.rectangle(imgX, imgY, imgW, imgH, {
       restitution: RESTITUTION_IMG,
       friction: FRICTION_IMG,
       frictionAir: AIR_IMG,
       collisionFilter: { category: 0x0002, mask: 0x0001 },
     })
-    Matter.Body.setStatic(photoBody, true)
-    Matter.Composite.add(engine.world, photoBody)
+    Matter.Body.setStatic(sketchBody, true)
+    Matter.Composite.add(engine.world, sketchBody)
 
     // Text bodies
     const bodies = items.map((item) => {
@@ -142,29 +136,30 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const linkBodies = bodies.filter((b) => (b as any)._meta.isLink)
     const wordBodies = bodies.filter((b) => !(b as any)._meta.isLink)
 
-    const drop = (b: Matter.Body, scatter = false) => {
+    const drop = (b: Matter.Body) => {
       Matter.Body.setStatic(b, false)
-      Matter.Body.setVelocity(b, { x: scatter ? (Math.random() - 0.5) * 3 : 0, y: 0 })
+      Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 3, y: 0 })
       Matter.Body.setAngularVelocity(b, 0)
     }
 
-    // Cascade — top link drops first, collisions activate the rest
-    const sortedLinks = [...linkBodies].sort((a, b) => a.position.y - b.position.y)
-    const topLink = sortedLinks[0]
-    const staticBodies = new Set<Matter.Body>([...wordBodies, ...sortedLinks.slice(1)])
+    // Cascade — top element drops first via pendulum, collisions activate the rest
+    const sorted = [...bodies].sort((a, b) => a.position.y - b.position.y)
+    const topBody = sorted[0]
+    const staticBodies = new Set<Matter.Body>(sorted.slice(1))
+    ;(topBody as any)._isActive = true
     linkBodies.forEach((b) => { (b as any)._isActive = true })
 
-    // Pendulum for top link
+    // Pendulum for top body
     setTimeout(() => {
-      Matter.Body.setStatic(topLink, false)
-      Matter.Body.setVelocity(topLink, { x: 0, y: 0 })
+      Matter.Body.setStatic(topBody, false)
+      Matter.Body.setVelocity(topBody, { x: 0, y: 0 })
 
-      const hx = (topLink.bounds.max.x - topLink.bounds.min.x) / 2
-      const hy = (topLink.bounds.max.y - topLink.bounds.min.y) / 2
+      const hx = (topBody.bounds.max.x - topBody.bounds.min.x) / 2
+      const hy = (topBody.bounds.max.y - topBody.bounds.min.y) / 2
 
       const pendulum = Matter.Constraint.create({
-        pointA: { x: topLink.position.x + hx, y: topLink.position.y - hy },
-        bodyB: topLink,
+        pointA: { x: topBody.position.x + hx, y: topBody.position.y - hy },
+        bodyB: topBody,
         pointB: { x: hx, y: -hy },
         stiffness: 0.02,
         damping: 0.01,
@@ -174,7 +169,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
 
       setTimeout(() => {
         Matter.Composite.remove(engine.world, pendulum)
-        drop(topLink)
+        drop(topBody)
       }, PENDULUM_RELEASE)
     }, PENDULUM_DELAY)
 
@@ -197,17 +192,16 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     // Mouse interaction
     const mouse = Matter.Mouse.create(canvas)
     mouse.pixelRatio = dpr
-    const mouseConstraint = Matter.MouseConstraint.create(engine, {
+    Matter.Composite.add(engine.world, Matter.MouseConstraint.create(engine, {
       mouse,
       constraint: { stiffness: 0.2, render: { visible: false } },
-    })
-    Matter.Composite.add(engine.world, mouseConstraint)
+    }))
 
     // Click detection
     let mouseDownPos = { x: 0, y: 0 }
-    const hitTest = (b: Matter.Body, cx: number, cy: number) => {
-      const dx = cx - b.position.x
-      const dy = cy - b.position.y
+    const hitTest = (b: Matter.Body, px: number, py: number) => {
+      const dx = px - b.position.x
+      const dy = py - b.position.y
       const cos = Math.cos(-b.angle)
       const sin = Math.sin(-b.angle)
       const lx = dx * cos - dy * sin
@@ -226,11 +220,8 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       const hit = linkBodies.find((b) => hitTest(b, e.clientX, e.clientY))
       if (hit) {
         const href = (hit as any)._meta.href
-        if (href === '__portfolio__') {
-          onEnter()
-        } else {
-          window.open(href, '_blank')
-        }
+        if (href === '__portfolio__') onEnter()
+        else window.open(href, '_blank')
       }
     })
 
@@ -243,25 +234,22 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const underlineH = fontSize * 0.1
     const underlineY = fontSize * 0.45
 
+    let raf = 0
     const loop = () => {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.fillStyle = bgColor
       ctx.fillRect(0, 0, W, H)
 
-      // Draw headshot
-      if (headshot.complete) {
+      // Draw sketch
+      if (sketch.complete && sketch.naturalWidth > 0) {
         ctx.save()
-        ctx.translate(photoBody.position.x, photoBody.position.y)
-        ctx.rotate(photoBody.angle)
-        ctx.globalAlpha = 0.08
-        ctx.beginPath()
-        ctx.arc(0, 0, imgW / 2, 0, Math.PI * 2)
-        ctx.clip()
-        ctx.drawImage(headshot, -imgW / 2, -imgH / 2, imgW, imgH)
+        ctx.translate(sketchBody.position.x, sketchBody.position.y)
+        ctx.rotate(sketchBody.angle)
+        ctx.drawImage(sketch, -imgW / 2, -imgH / 2, imgW, imgH)
         ctx.restore()
       }
 
-      // Draw text bodies
+      // Draw text
       ctx.font = `700 ${fontSize}px Helvetica, Arial, sans-serif`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
@@ -274,27 +262,17 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
         ctx.fillStyle = meta.fill
         ctx.fillText(meta.label, 0, 0)
 
-        // Underline for links
         if (meta.isLink) {
-          ctx.fillStyle = meta.fill
           ctx.fillRect(-meta.w / 2, underlineY, meta.w, underlineH)
         }
-
         ctx.restore()
       })
 
-      // Hint text at bottom
-      ctx.font = `400 ${smallSize}px Sentient, Georgia, serif`
-      ctx.fillStyle = mutedColor
-      ctx.textAlign = 'center'
-      ctx.fillText('drag to rearrange · click portfolio to enter', W / 2, H - 20)
-
-      requestAnimationFrame(loop)
+      raf = requestAnimationFrame(loop)
     }
+    raf = requestAnimationFrame(loop)
 
-    const raf = requestAnimationFrame(loop)
-
-    // Resize handler
+    // Resize
     const onResize = () => {
       canvas.width = window.innerWidth * dpr
       canvas.height = window.innerHeight * dpr
@@ -313,7 +291,6 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
   }, [onEnter])
 
   useEffect(() => {
-    // Small delay to ensure fonts are loaded
     const timer = setTimeout(setup, 200)
     return () => {
       clearTimeout(timer)
