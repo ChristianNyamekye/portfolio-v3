@@ -71,20 +71,20 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const imgX = cx
     const imgY = cy
 
-    // "welcome to the portfolio site of <CN/>"
-    // Each word separate, arranged in an arc AROUND the sketch
-    const r = Math.max(imgW, imgH) * 0.9
+    // Domino layout — each item positioned so it will be hit by the one above.
+    // "welcome" swings on pendulum → hits "to" → hits "the" → ... → sketch last
+    const step = fontSize * 1.6  // vertical gap — close enough for domino contact
 
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      // Top — this one swings on a pendulum and knocks the rest
-      { label: 'welcome', x: imgX - r * 1.2, y: imgY - r * 1.6, angle: -0.14, isLink: false, href: null, fill: textColor },
-      // Clustered around the sketch so the cascade works
-      { label: 'to', x: imgX - r * 1.4, y: imgY - r * 0.8, angle: -0.20, isLink: false, href: null, fill: textColor },
-      { label: 'the', x: imgX - r * 1.6, y: imgY - r * 0.1, angle: -0.28, isLink: false, href: null, fill: textColor },
-      { label: 'portfolio', x: imgX - r * 1.3, y: imgY + r * 0.5, angle: -0.32, isLink: true, href: '__portfolio__', fill: linkColor },
-      { label: 'site', x: imgX - r * 0.8, y: imgY + r * 1.0, angle: -0.36, isLink: false, href: null, fill: textColor },
-      { label: 'of', x: imgX + r * 0.1, y: imgY + r * 1.2, angle: -0.22, isLink: false, href: null, fill: textColor },
-      { label: '<CN/>', x: imgX + r * 0.8, y: imgY + r * 0.9, angle: -0.12, isLink: false, href: null, fill: linkColor, isBrand: true },
+      // Pendulum word (topmost)
+      { label: 'welcome',   x: cx - step * 0.5, y: cy - step * 3,    angle: -0.10, isLink: false, href: null, fill: textColor },
+      // Each one slightly offset horizontally for the arc, but vertically stacked for domino
+      { label: 'to',        x: cx - step * 0.8, y: cy - step * 2,    angle: -0.18, isLink: false, href: null, fill: textColor },
+      { label: 'the',       x: cx - step * 1.0, y: cy - step * 1,    angle: -0.25, isLink: false, href: null, fill: textColor },
+      { label: 'portfolio', x: cx - step * 0.7, y: cy,                angle: -0.30, isLink: true, href: '__portfolio__', fill: linkColor },
+      { label: 'site',      x: cx - step * 0.3, y: cy + step * 1,    angle: -0.22, isLink: false, href: null, fill: textColor },
+      { label: 'of',        x: cx + step * 0.2, y: cy + step * 1.8,  angle: -0.15, isLink: false, href: null, fill: textColor },
+      { label: '<CN/>',     x: cx + step * 0.6, y: cy + step * 2.5,  angle: -0.08, isLink: false, href: null, fill: linkColor, isBrand: true },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
@@ -109,7 +109,8 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     ])
 
     // Sketch body — participates in physics
-    const sketchBody = Matter.Bodies.rectangle(imgX, imgY, imgW * 0.8, imgH * 0.8, {
+    // Sketch at the end of the domino chain
+    const sketchBody = Matter.Bodies.rectangle(cx + step * 0.8, cy + step * 3.3, imgW * 0.8, imgH * 0.8, {
       restitution: RESTITUTION_IMG,
       friction: FRICTION_IMG,
       frictionAir: AIR_IMG,
@@ -199,16 +200,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       })
     })
 
-    // Safety net — anything still stuck after 15s drops
-    setTimeout(() => {
-      staticBodies.forEach((b) => {
-        staticBodies.delete(b)
-        ;(b as any)._isActive = true
-        Matter.Body.setStatic(b, false)
-        Matter.Sleeping.set(b, false)
-        Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0.5 })
-      })
-    }, 15000)
+    // No safety net needed — domino layout guarantees full cascade
 
     // Clamp velocity to prevent bodies from escaping
     Matter.Events.on(engine, 'beforeUpdate', () => {
