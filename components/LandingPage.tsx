@@ -152,7 +152,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
           drop(body)
         }, i * 150) // 150ms stagger between each body
       })
-    }, 4000)
+    }, 2500)
 
     // Clamp velocity to prevent bodies from escaping
     Matter.Events.on(engine, 'beforeUpdate', () => {
