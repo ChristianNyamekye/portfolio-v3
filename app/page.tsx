@@ -6,6 +6,7 @@ import LandingPage from '@/components/LandingPage'
 import Portfolio from '@/components/Portfolio'
 import AIAssistant from '@/components/AIAssistant'
 import SmoothScroll from '@/components/SmoothScroll'
+import FooterGradient from '@/components/FooterGradient'
 
 type Phase = 'landing' | 'portfolio'
 
@@ -38,17 +39,21 @@ export default function Home() {
       )}
 
       {phase === 'portfolio' && (
-        <motion.main
+        <motion.div
           key="portfolio"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="relative min-h-screen bg-[var(--background)]"
         >
           <SmoothScroll />
-          <Portfolio />
+          {/* Main content — white bg, sits above the gradient footer */}
+          <main className="relative z-[2] bg-[var(--background)] rounded-b-3xl shadow-[0_4px_30px_rgba(0,0,0,0.08)]">
+            <Portfolio />
+          </main>
+          {/* Gradient footer — revealed as you scroll past main */}
+          <FooterGradient />
           <AIAssistant />
-        </motion.main>
+        </motion.div>
       )}
     </AnimatePresence>
   )
