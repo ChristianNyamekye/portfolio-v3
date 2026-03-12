@@ -141,62 +141,17 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       Matter.Body.setAngularVelocity(b, 0)
     }
 
-    // Collision-based cascade — top body drops first via pendulum,
-    // others activate when hit by a moving body
+    // After 4 seconds, everything drops with staggered timing
+    // Sorted top-to-bottom so upper items fall first (natural feel)
     const sorted = [...allBodies].sort((a, b) => a.position.y - b.position.y)
-    const topBody = sorted[0]
-    const staticBodies = new Set<Matter.Body>(sorted.slice(1))
-    ;(topBody as any)._isActive = true
-    linkBodies.forEach((b) => { (b as any)._isActive = true })
 
-    // Pendulum for top body
     setTimeout(() => {
-      Matter.Body.setStatic(topBody, false)
-      Matter.Body.setVelocity(topBody, { x: 0, y: 0 })
-
-      const hx = (topBody.bounds.max.x - topBody.bounds.min.x) / 2
-      const hy = (topBody.bounds.max.y - topBody.bounds.min.y) / 2
-
-      const pendulum = Matter.Constraint.create({
-        pointA: { x: topBody.position.x + hx, y: topBody.position.y - hy },
-        bodyB: topBody,
-        pointB: { x: hx, y: -hy },
-        stiffness: 0.02,
-        damping: 0.01,
-        length: 0,
+      sorted.forEach((body, i) => {
+        setTimeout(() => {
+          drop(body)
+        }, i * 150) // 150ms stagger between each body
       })
-      Matter.Composite.add(engine.world, pendulum)
-
-      setTimeout(() => {
-        Matter.Composite.remove(engine.world, pendulum)
-        drop(topBody)
-      }, PENDULUM_RELEASE)
-    }, PENDULUM_DELAY)
-
-    // Collision cascade — moving body hits static → static drops
-    Matter.Events.on(engine, 'collisionStart', ({ pairs }) => {
-      pairs.forEach(({ bodyA: a, bodyB: b }) => {
-        if ((a as any)._isActive && !a.isStatic && staticBodies.has(b)) {
-          staticBodies.delete(b)
-          ;(b as any)._isActive = true
-          drop(b)
-        }
-        if ((b as any)._isActive && !b.isStatic && staticBodies.has(a)) {
-          staticBodies.delete(a)
-          ;(a as any)._isActive = true
-          drop(a)
-        }
-      })
-    })
-
-    // Safety net — if anything is still static after 15s, drop it
-    setTimeout(() => {
-      staticBodies.forEach((b) => {
-        staticBodies.delete(b)
-        ;(b as any)._isActive = true
-        drop(b)
-      })
-    }, 15000)
+    }, 4000)
 
     // Clamp velocity to prevent bodies from escaping
     Matter.Events.on(engine, 'beforeUpdate', () => {
