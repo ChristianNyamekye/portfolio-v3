@@ -71,22 +71,18 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const imgX = cx
     const imgY = cy
 
-    // "welcome to the portfolio site of CN"
-    // Arranged in an arc AROUND the sketch — left side going down, right side going up
-    const r = Math.max(imgW, imgH) * 0.9 // radius from center of sketch
+    // "welcome to the portfolio site of <CN/>"
+    // Each word separate, arranged in an arc AROUND the sketch
+    const r = Math.max(imgW, imgH) * 0.9
 
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      // Upper left arc
-      { label: 'welcome', x: imgX - r * 1.8, y: imgY - r * 1.2, angle: -0.15, isLink: false, href: null, fill: textColor },
-      { label: 'to the', x: imgX - r * 1.4, y: imgY - r * 0.5, angle: -0.25, isLink: false, href: null, fill: textColor },
-      // Left side
-      { label: 'portfolio', x: imgX - r * 1.6, y: imgY + r * 0.2, angle: -0.35, isLink: true, href: '__portfolio__', fill: linkColor },
-      // Bottom left
-      { label: 'site', x: imgX - r * 1.2, y: imgY + r * 0.9, angle: -0.40, isLink: false, href: null, fill: textColor },
-      // Bottom
-      { label: 'of', x: imgX - r * 0.3, y: imgY + r * 1.2, angle: -0.30, isLink: false, href: null, fill: textColor },
-      // Bottom right — the brand
-      { label: '<CN/>', x: imgX + r * 0.6, y: imgY + r * 1.0, angle: -0.20, isLink: false, href: null, fill: linkColor, isBrand: true },
+      { label: 'welcome', x: imgX - r * 1.8, y: imgY - r * 1.2, angle: -0.12, isLink: false, href: null, fill: textColor },
+      { label: 'to', x: imgX - r * 1.5, y: imgY - r * 0.5, angle: -0.20, isLink: false, href: null, fill: textColor },
+      { label: 'the', x: imgX - r * 1.8, y: imgY + r * 0.1, angle: -0.28, isLink: false, href: null, fill: textColor },
+      { label: 'portfolio', x: imgX - r * 1.6, y: imgY + r * 0.7, angle: -0.35, isLink: true, href: '__portfolio__', fill: linkColor },
+      { label: 'site', x: imgX - r * 1.0, y: imgY + r * 1.2, angle: -0.38, isLink: false, href: null, fill: textColor },
+      { label: 'of', x: imgX + r * 0.2, y: imgY + r * 1.3, angle: -0.25, isLink: false, href: null, fill: textColor },
+      { label: '<CN/>', x: imgX + r * 1.0, y: imgY + r * 1.1, angle: -0.15, isLink: false, href: null, fill: linkColor, isBrand: true },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
@@ -142,15 +138,13 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const drop = (b: Matter.Body) => {
       Matter.Body.setStatic(b, false)
       Matter.Body.setVelocity(b, { x: (Math.random() - 0.5) * 2, y: 0 })
-      Matter.Body.setAngularVelocity(b, 0)
+      Matter.Body.setAngularVelocity(b, (Math.random() - 0.5) * 0.05)
     }
 
-    // Cascade
+    // Staggered timed drops — top body first via pendulum, then each subsequent body
+    // drops after a short delay. No body gets stuck.
     const sorted = [...allBodies].sort((a, b) => a.position.y - b.position.y)
     const topBody = sorted[0]
-    const staticBodies = new Set<Matter.Body>(sorted.slice(1))
-    ;(topBody as any)._isActive = true
-    linkBodies.forEach((b) => { (b as any)._isActive = true })
 
     // Pendulum for top body
     setTimeout(() => {
@@ -176,17 +170,28 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       }, PENDULUM_RELEASE)
     }, PENDULUM_DELAY)
 
-    // Collision cascade
+    // Staggered drops for remaining bodies — collision OR timeout, whichever first
+    const dropped = new Set<Matter.Body>([topBody])
+
+    sorted.slice(1).forEach((body, i) => {
+      // Each body drops after staggered delay (even without collision)
+      setTimeout(() => {
+        if (!dropped.has(body)) {
+          dropped.add(body)
+          drop(body)
+        }
+      }, PENDULUM_DELAY + 800 + i * 400)
+    })
+
+    // Also drop on collision (faster cascade if things collide)
     Matter.Events.on(engine, 'collisionStart', ({ pairs }) => {
       pairs.forEach(({ bodyA: a, bodyB: b }) => {
-        if ((a as any)._isActive && !a.isStatic && staticBodies.has(b)) {
-          staticBodies.delete(b)
-          ;(b as any)._isActive = true
+        if (!a.isStatic && b.isStatic && !dropped.has(b)) {
+          dropped.add(b)
           drop(b)
         }
-        if ((b as any)._isActive && !b.isStatic && staticBodies.has(a)) {
-          staticBodies.delete(a)
-          ;(a as any)._isActive = true
+        if (!b.isStatic && a.isStatic && !dropped.has(a)) {
+          dropped.add(a)
           drop(a)
         }
       })
