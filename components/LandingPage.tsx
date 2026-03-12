@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import Matter from 'matter-js'
 
 const GRAVITY = 0.5
-const PENDULUM_DELAY = 1250
+const PENDULUM_DELAY = 1750
 const PENDULUM_RELEASE = 8000
 const RESTITUTION_TEXT = 0.25
 const RESTITUTION_IMG = 0.75
@@ -71,26 +71,27 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
     const imgX = cx
     const imgY = cy
 
-    // Snaking path layout — words chain around the sketch so cascade propagates
-    // "welcome" swings → hits "to" → hits "the" → ... → everything falls
-    // Each word within ~1.5 font-heights of the NEXT word in sequence
-    const g = fontSize * 1.8 // gap unit — just close enough for collision
+    // Snaking path around sketch — no overlaps, each word within collision reach of the next
+    // Chain: welcome → to → the → portfolio → site → of → <CN/> → sketch
+    const g = fontSize * 1.6
+    const halfSketchW = imgW * 0.5
+    const halfSketchH = imgH * 0.5
 
     const rawItems: Omit<TextItem, 'w' | 'h'>[] = [
-      // 1. "welcome" — top-left, THE pendulum. Swings right+down to hit "to"
-      { label: 'welcome',   x: cx - g * 2.0, y: cy - g * 2.5, angle: -0.12, isLink: false, href: null, fill: textColor },
-      // 2. "to" — right of welcome, slightly lower. Gets hit first.
-      { label: 'to',        x: cx + g * 0.5, y: cy - g * 1.8, angle: 0.10,  isLink: false, href: null, fill: textColor },
-      // 3. "the" — below-right of "to"
-      { label: 'the',       x: cx + g * 2.0, y: cy - g * 0.5, angle: 0.15,  isLink: false, href: null, fill: textColor },
-      // 4. "portfolio" — below "the", swings left. THE LINK.
-      { label: 'portfolio', x: cx + g * 0.8, y: cy + g * 0.6, angle: -0.08, isLink: true, href: '__portfolio__', fill: linkColor },
-      // 5. "site" — left of portfolio
-      { label: 'site',      x: cx - g * 1.5, y: cy + g * 0.3, angle: -0.18, isLink: false, href: null, fill: textColor },
-      // 6. "of" — below-left of site
-      { label: 'of',        x: cx - g * 2.2, y: cy + g * 1.5, angle: -0.10, isLink: false, href: null, fill: textColor },
-      // 7. "<CN/>" — bottom center
-      { label: '<CN/>',     x: cx + g * 0.2, y: cy + g * 2.5, angle: -0.05, isLink: false, href: null, fill: linkColor, isBrand: true },
+      // 1. "welcome" — top-left, THE pendulum
+      { label: 'welcome',   x: cx - g * 2.5, y: cy - halfSketchH - g * 2.5, angle: -0.12, isLink: false, href: null, fill: textColor },
+      // 2. "to" — right of welcome, slightly lower
+      { label: 'to',        x: cx - g * 0.2, y: cy - halfSketchH - g * 1.5, angle: 0.10,  isLink: false, href: null, fill: textColor },
+      // 3. "the" — further right, dropping toward sketch
+      { label: 'the',       x: cx + g * 1.8, y: cy - halfSketchH - g * 0.5, angle: 0.15,  isLink: false, href: null, fill: textColor },
+      // 4. "portfolio" — right side of sketch. THE LINK.
+      { label: 'portfolio', x: cx + halfSketchW + g * 1.5, y: cy - g * 0.2, angle: -0.08, isLink: true, href: '__portfolio__', fill: linkColor },
+      // 5. "site" — below-right, curving under sketch
+      { label: 'site',      x: cx + g * 1.5, y: cy + halfSketchH + g * 0.6, angle: -0.12, isLink: false, href: null, fill: textColor },
+      // 6. "of" — below sketch, left side
+      { label: 'of',        x: cx - g * 1.0, y: cy + halfSketchH + g * 1.2, angle: -0.10, isLink: false, href: null, fill: textColor },
+      // 7. "<CN/>" — below-left, last word before sketch gets knocked
+      { label: '<CN/>',     x: cx - g * 2.5, y: cy + halfSketchH + g * 0.3, angle: -0.05, isLink: false, href: null, fill: linkColor, isBrand: true },
     ]
 
     const items: TextItem[] = rawItems.map((item) => {
@@ -117,16 +118,11 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       wall(W + WALL_THICKNESS / 2, H / 2, WALL_THICKNESS, H * 3),       // right
     ])
 
-    // Collision layers — text collides with text, sketch separate (drops by proximity)
-    const LAYER_TEXT = 0x0001
-    const LAYER_IMG = 0x0002
-
-    // Sketch body — center, separate collision layer (drops by proximity like Rene)
+    // Everything on same collision layer — sketch is part of the domino chain
     const sketchBody = Matter.Bodies.rectangle(cx, cy, imgW * 0.8, imgH * 0.8, {
       restitution: RESTITUTION_IMG,
       friction: FRICTION_IMG,
       frictionAir: AIR_IMG,
-      collisionFilter: { category: LAYER_IMG, mask: LAYER_TEXT },
     })
     Matter.Body.setStatic(sketchBody, true)
     ;(sketchBody as any)._isSketch = true
@@ -139,7 +135,7 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
         friction: FRICTION_TEXT,
         frictionAir: AIR_TEXT,
         angle: item.angle,
-        collisionFilter: { category: LAYER_TEXT, mask: LAYER_TEXT },
+        // No collision filter — everything collides with everything
       })
       ;(b as any)._meta = item
       Matter.Body.setStatic(b, true)
@@ -258,19 +254,6 @@ export default function LandingPage({ onEnter }: { onEnter: () => void }) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.fillStyle = bgColor
       ctx.fillRect(0, 0, W, H)
-
-      // Proximity check — if any moving text body gets close to sketch, drop it (like Rene)
-      if (sketchBody.isStatic) {
-        const threshold = (imgW + Math.max(...items.map(i => i.w))) / 2
-        textBodies.forEach((b) => {
-          if (b.isStatic) return
-          const dx = b.position.x - sketchBody.position.x
-          const dy = b.position.y - sketchBody.position.y
-          if (dx * dx + dy * dy < threshold * threshold) {
-            Matter.Body.setStatic(sketchBody, false)
-          }
-        })
-      }
 
       // Draw sketch
       if (sketch.complete && sketch.naturalWidth > 0) {
