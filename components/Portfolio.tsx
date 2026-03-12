@@ -138,7 +138,7 @@ export default function Portfolio() {
       </div>
 
       
-      <div className="mt-6 flex-shrink-0">
+      <div className="mt-4 flex-shrink-0">
         <button
           onClick={() => setShowNotable(!showNotable)}
           className="text-xs text-[var(--muted)] hover:text-[var(--text)] transition-colors flex items-center gap-1.5"
@@ -147,7 +147,7 @@ export default function Portfolio() {
           <ChevronDown size={12} className={`transition-transform duration-200 ${showNotable ? 'rotate-180' : ''}`} />
         </button>
         <div
-          className="grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          className="grid transition-[grid-template-rows] duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
           style={{ gridTemplateRows: showNotable ? '1fr' : '0fr' }}
         >
           <div className="overflow-hidden">
