@@ -165,7 +165,7 @@ export default function FooterGradient() {
             Right now I&apos;m in {MY_CITY}, where it&apos;s <LocalTime />
           </p>
           <p className="text-sm pt-8" style={{ color: fg, opacity: 0.8 }}>
-            let&apos;s grab a coffee:{' '}
+            let&apos;s make something real:{' '}
             <a href="mailto:christiankingnyamekye@gmail.com" className="underline underline-offset-2 hover:opacity-70 transition-opacity">
               christiankingnyamekye@gmail.com
             </a>
