@@ -126,16 +126,22 @@ export default function FooterGradient() {
 
   const gradientStyle = `linear-gradient(180deg, ${colors.g1} 20%, ${colors.g2} 55%, ${colors.g3} 100%)`
 
-  // Only set html bg when gradient is actually revealing
+  // When gradient is revealing, override html+body bg to transparent
+  // so the fixed gradient div shows through without cream/white overlay
   const isRevealing = reveal > 0.01
   useEffect(() => {
+    const html = document.documentElement
+    const body = document.body
     if (isRevealing) {
-      document.documentElement.style.setProperty('background', colors.g3)
+      html.style.setProperty('background', colors.g3)
+      body.style.setProperty('background', 'transparent')
     } else {
-      document.documentElement.style.removeProperty('background')
+      html.style.removeProperty('background')
+      body.style.removeProperty('background')
     }
     return () => {
-      document.documentElement.style.removeProperty('background')
+      html.style.removeProperty('background')
+      body.style.removeProperty('background')
     }
   }, [isRevealing, colors.g3])
 
