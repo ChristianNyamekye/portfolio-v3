@@ -114,7 +114,7 @@ export default function Portfolio() {
               />
             </div>
             <div>
-              <h1 className="text-sm font-medium tracking-tight">Christian Nyamekye</h1>
+              <h1 className="text-sm italic font-medium tracking-tight">Christian Nyamekye</h1>
               <span className="text-[11px] text-[var(--muted)] italic"> &mdash; {hero.eyebrow}</span>
             </div>
           </div>
