@@ -56,25 +56,30 @@ function interpolateGradient(frac: number) {
   return { g1: lerpColor(a.g1, b.g1, t), g2: lerpColor(a.g2, b.g2, t), g3: lerpColor(a.g3, b.g3, t) }
 }
 
-/**
- * YOUR location — update this when you move.
- * timezone: IANA timezone string (for accurate local time)
- * city: display name shown in the footer
- */
-const MY_LOCATION = {
-  timezone: 'America/New_York',
-  city: 'New York',
-  // When you move to SF: timezone: 'America/Los_Angeles', city: 'San Francisco'
+/** Fetches YOUR location from IP geolocation (no permissions needed) */
+async function fetchMyLocation(): Promise<{ timezone: string; city: string }> {
+  const fallback = { timezone: 'America/New_York', city: 'New York' }
+  try {
+    const res = await fetch('https://worldtimeapi.org/api/ip', { signal: AbortSignal.timeout(3000) })
+    if (!res.ok) return fallback
+    const data = await res.json()
+    // timezone is like "America/New_York" → extract city
+    const tz: string = data.timezone || fallback.timezone
+    const city = tz.split('/').pop()?.replace(/_/g, ' ') || fallback.city
+    return { timezone: tz, city }
+  } catch {
+    return fallback
+  }
 }
 
-function FooterTimeGradient() {
+function FooterTimeGradient({ timezone }: { timezone: string }) {
   useEffect(() => {
     const html = document.documentElement
     html.dataset.footerGradient = 'on'
     html.dataset.footerGradientReady = '0'
 
     function update() {
-      const { hour, minute, second } = getTimeInZone(MY_LOCATION.timezone)
+      const { hour, minute, second } = getTimeInZone(timezone)
       const frac = hour + minute / 60 + second / 3600
       const { g1, g2, g3 } = interpolateGradient(frac)
 
@@ -102,7 +107,7 @@ function FooterTimeGradient() {
     update()
     requestAnimationFrame(() => { html.dataset.footerGradientReady = '1' })
 
-    const { second } = getTimeInZone(MY_LOCATION.timezone)
+    const { second } = getTimeInZone(timezone)
     const timeout = setTimeout(() => {
       update()
       const interval = setInterval(update, 60000)
@@ -111,18 +116,18 @@ function FooterTimeGradient() {
 
     let cleanup = () => {}
     return () => { clearTimeout(timeout); cleanup() }
-  }, [])
+  }, [timezone])
 
   return null
 }
 
-function LocalTime() {
+function LocalTime({ timezone }: { timezone: string }) {
   const [time, setTime] = useState<string | null>(null)
   const [iso, setIso] = useState<string | null>(null)
 
   useEffect(() => {
     const fmt = new Intl.DateTimeFormat('en-US', {
-      timeZone: MY_LOCATION.timezone, hour: 'numeric', minute: '2-digit', hour12: true,
+      timeZone: timezone, hour: 'numeric', minute: '2-digit', hour12: true,
     })
     function tick() {
       const now = new Date()
@@ -132,17 +137,23 @@ function LocalTime() {
     tick()
     const id = setInterval(tick, 60000)
     return () => clearInterval(id)
-  }, [])
+  }, [timezone])
 
   return <time dateTime={iso ?? undefined}>{time ?? '\u2014'}</time>
 }
 
 export default function FooterGradient() {
-  const city = MY_LOCATION.city
+  const [location, setLocation] = useState({ timezone: 'America/New_York', city: 'New York' })
+
+  useEffect(() => {
+    fetchMyLocation().then(setLocation)
+  }, [])
+
+  const { timezone, city } = location
 
   return (
     <>
-      <FooterTimeGradient />
+      <FooterTimeGradient timezone={timezone} />
       <footer
         id="site-footer"
         className="relative z-[1] w-full pt-12 sm:pt-24 pb-16 sm:pb-32"
@@ -152,7 +163,7 @@ export default function FooterGradient() {
             className="text-sm leading-relaxed pt-2"
             style={{ color: 'var(--footer-fg)' }}
           >
-            Right now I&apos;m in {city}, where it&apos;s <LocalTime />
+            Right now I&apos;m in {city}, where it&apos;s <LocalTime timezone={timezone} />
           </p>
           <p
             className="text-sm italic pt-12 font-medium tracking-tight"

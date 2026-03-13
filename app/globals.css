@@ -41,7 +41,7 @@ html {
   }
 }
 
-html {
+html[data-footer-gradient] {
   background: var(--footer-g3);
 }
 
@@ -49,7 +49,7 @@ html[data-footer-gradient-ready="1"] {
   transition: --footer-g1 60s linear, --footer-g2 60s linear, --footer-g3 60s linear;
 }
 
-body::before {
+html[data-footer-gradient] body::before {
   content: "";
   position: fixed;
   inset: 0;
