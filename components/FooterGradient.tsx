@@ -13,8 +13,8 @@ const COLOR_STOPS = [
   { hour: 22, g1: '#1e1145', g2: '#0f172a', g3: '#0a0e27' },
 ]
 
-const MY_TIMEZONE = 'America/New_York'
-const MY_CITY = 'New York'
+const MY_TIMEZONE = process.env.NEXT_PUBLIC_MY_TIMEZONE || 'America/New_York'
+const MY_CITY = process.env.NEXT_PUBLIC_MY_CITY || 'New York'
 
 function clamp01(v: number) { return Math.min(1, Math.max(0, v)) }
 
@@ -162,6 +162,14 @@ export default function FooterGradient() {
         <div className="mx-auto w-full max-w-2xl px-8 text-center flex flex-col gap-1.5">
           <p className="text-sm leading-relaxed pt-2" style={{ color: fg }}>
             Right now I&apos;m in {MY_CITY}, where it&apos;s <LocalTime />
+          </p>
+          <p className="text-sm pt-4" style={{ color: fg, opacity: 0.8 }}>
+            Dartmouth &apos;26 · EE &amp; CS
+          </p>
+          <p className="text-sm pt-1" style={{ color: fg, opacity: 0.8 }}>
+            <a href="mailto:christian.k.nyamekye.26@dartmouth.edu" className="underline underline-offset-2 hover:opacity-70 transition-opacity">
+              christian.k.nyamekye.26@dartmouth.edu
+            </a>
           </p>
           <p
             className="text-sm italic font-medium tracking-tight pt-12"
