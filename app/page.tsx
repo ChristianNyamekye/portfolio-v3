@@ -45,14 +45,13 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="bg-[var(--background)]"
         >
           <SmoothScroll />
           <FooterReveal />
-          {/* Main content — scales down + rounds corners as you scroll, revealing gradient */}
           <main className="site-surface">
             <Portfolio />
           </main>
-          {/* Gradient footer — sits behind main at z-1, revealed on scroll */}
           <FooterGradient />
           <AIAssistant />
         </motion.div>

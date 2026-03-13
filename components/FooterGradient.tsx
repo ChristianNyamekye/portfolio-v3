@@ -2,12 +2,6 @@
 
 import { useEffect, useState } from 'react'
 
-/**
- * Location is stored in /location.json
- * To update: change public/location.json → redeploy
- * Or just tell Jarvis "I moved to SF" and he'll handle it.
- */
-
 /* ── Gradient palette ── */
 const COLOR_STOPS = [
   { hour: 0,  g1: '#0a0e27', g2: '#1a1145', g3: '#2d1b69' },
@@ -63,63 +57,15 @@ function interpolateGradient(frac: number) {
   return { g1: lerpColor(a.g1, b.g1, t), g2: lerpColor(a.g2, b.g2, t), g3: lerpColor(a.g3, b.g3, t) }
 }
 
-function FooterTimeGradient({ timezone }: { timezone: string }) {
-  useEffect(() => {
-    const html = document.documentElement
-
-    function update() {
-      const { hour, minute, second } = getTimeInZone(timezone)
-      const frac = hour + minute / 60 + second / 3600
-      const { g1, g2, g3 } = interpolateGradient(frac)
-
-      html.style.setProperty('--footer-g1', g1)
-      html.style.setProperty('--footer-g2', g2)
-      html.style.setProperty('--footer-g3', g3)
-
-      const avgLum = (sRGBLuminance(g1) + sRGBLuminance(g2) + sRGBLuminance(g3)) / 3
-      const isLight = avgLum > 0.3
-      html.dataset.footerTone = isLight ? 'light' : 'dark'
-
-      if (isLight) {
-        html.style.setProperty('--footer-fg', '#111110')
-      } else {
-        html.style.setProperty('--footer-fg', '#ffffff')
-      }
-    }
-
-    // Set colors first, then reveal after delay to avoid flicker
-    update()
-    const revealTimeout = setTimeout(() => {
-      html.dataset.footerGradient = 'on'
-      requestAnimationFrame(() => { html.dataset.footerGradientReady = '1' })
-    }, 800)
-
-    const { second } = getTimeInZone(timezone)
-    const syncTimeout = setTimeout(() => {
-      update()
-      const interval = setInterval(update, 60000)
-      cleanupInterval = () => clearInterval(interval)
-    }, (60 - second) * 1000)
-
-    let cleanupInterval = () => {}
-
-    return () => {
-      clearTimeout(revealTimeout)
-      clearTimeout(syncTimeout)
-      cleanupInterval()
-      delete html.dataset.footerGradient
-      delete html.dataset.footerGradientReady
-      delete html.dataset.footerTone
-      html.style.removeProperty('--footer-g1')
-      html.style.removeProperty('--footer-g2')
-      html.style.removeProperty('--footer-g3')
-      html.style.removeProperty('--footer-fg')
-      html.style.removeProperty('--page-reveal')
-      html.style.removeProperty('--page-scale-amount')
-    }
-  }, [timezone])
-
-  return null
+/** Get browser timezone + city name */
+function getBrowserLocation() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const city = tz.split('/').pop()?.replace(/_/g, ' ') || ''
+    return { timezone: tz, city }
+  } catch {
+    return null
+  }
 }
 
 function LocalTime({ timezone }: { timezone: string }) {
@@ -132,9 +78,7 @@ function LocalTime({ timezone }: { timezone: string }) {
       fmt = new Intl.DateTimeFormat('en-US', {
         timeZone: timezone, hour: 'numeric', minute: '2-digit', hour12: true,
       })
-    } catch {
-      return
-    }
+    } catch { return }
     function tick() {
       const now = new Date()
       setTime(fmt.format(now).toLowerCase())
@@ -148,43 +92,89 @@ function LocalTime({ timezone }: { timezone: string }) {
   return <time dateTime={iso ?? undefined}>{time ?? ''}</time>
 }
 
-interface LocationData {
-  timezone: string
-  city: string
-}
-
 export default function FooterGradient() {
-  const [location, setLocation] = useState<LocationData | null>(null)
+  const [location, setLocation] = useState<{ timezone: string; city: string } | null>(null)
+  const [colors, setColors] = useState({ g1: '#0a0e27', g2: '#1a1145', g3: '#2d1b69' })
+  const [fg, setFg] = useState('#ffffff')
+  const [visible, setVisible] = useState(false)
 
+  // Get location from browser
   useEffect(() => {
-    fetch('/location.json')
-      .then(r => r.ok ? r.json() : null)
-      .then((data: LocationData | null) => {
-        if (data?.timezone && data?.city) setLocation(data)
-      })
-      .catch(() => {})
+    const loc = getBrowserLocation()
+    if (loc) setLocation(loc)
   }, [])
 
-  // Always render the gradient (uses fallback timezone for colors)
-  // But only show location text if we have valid data
-  const tz = location?.timezone || 'America/New_York'
+  // Update gradient colors based on time
+  useEffect(() => {
+    const tz = location?.timezone || 'America/New_York'
+
+    function update() {
+      const { hour, minute, second } = getTimeInZone(tz)
+      const frac = hour + minute / 60 + second / 3600
+      const grad = interpolateGradient(frac)
+      setColors(grad)
+
+      const avgLum = (sRGBLuminance(grad.g1) + sRGBLuminance(grad.g2) + sRGBLuminance(grad.g3)) / 3
+      setFg(avgLum > 0.3 ? '#111110' : '#ffffff')
+    }
+
+    update()
+
+    // Fade in after portfolio has settled
+    const revealTimeout = setTimeout(() => setVisible(true), 800)
+
+    const { second } = getTimeInZone(tz)
+    let intervalCleanup = () => {}
+    const syncTimeout = setTimeout(() => {
+      update()
+      const interval = setInterval(update, 60000)
+      intervalCleanup = () => clearInterval(interval)
+    }, (60 - second) * 1000)
+
+    return () => {
+      clearTimeout(revealTimeout)
+      clearTimeout(syncTimeout)
+      intervalCleanup()
+    }
+  }, [location])
+
+  const gradientStyle = `linear-gradient(180deg, ${colors.g1} 20%, ${colors.g2} 55%, ${colors.g3} 100%)`
+
+  // Set html bg to bottom gradient color (visible below the footer)
+  useEffect(() => {
+    if (visible) {
+      document.documentElement.style.background = colors.g3
+    }
+    return () => {
+      document.documentElement.style.background = ''
+    }
+  }, [visible, colors.g3])
 
   return (
     <>
-      <FooterTimeGradient timezone={tz} />
+      {/* Fixed gradient background — unmounts with portfolio */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-600"
+        style={{
+          background: gradientStyle,
+          opacity: visible ? 1 : 0,
+        }}
+      />
+
       <footer
         id="site-footer"
         className="relative z-[1] w-full pt-12 sm:pt-24 pb-16 sm:pb-32"
+        style={{ background: visible ? colors.g3 : 'transparent' }}
       >
         <div className="mx-auto w-full max-w-2xl px-8 text-center flex flex-col gap-1.5">
           {location && (
-            <p className="text-sm leading-relaxed pt-2" style={{ color: 'var(--footer-fg)' }}>
+            <p className="text-sm leading-relaxed pt-2" style={{ color: fg }}>
               Right now I&apos;m in {location.city}, where it&apos;s <LocalTime timezone={location.timezone} />
             </p>
           )}
           <p
             className={`text-sm italic font-medium tracking-tight ${location ? 'pt-12' : 'pt-2'}`}
-            style={{ color: 'var(--footer-fg)', opacity: 0.7 }}
+            style={{ color: fg, opacity: 0.7 }}
           >
             &copy; {new Date().getFullYear()}, Christian Nyamekye
           </p>
