@@ -164,12 +164,10 @@ export default function FooterGradient() {
           <p className="text-sm leading-relaxed pt-2" style={{ color: fg }}>
             Right now I&apos;m in {MY_CITY}, where it&apos;s <LocalTime />
           </p>
-          <p className="text-sm pt-4" style={{ color: fg, opacity: 0.8 }}>
-            Dartmouth &apos;26 · EE &amp; CS
-          </p>
-          <p className="text-sm pt-1" style={{ color: fg, opacity: 0.8 }}>
-            <a href="mailto:christian.k.nyamekye.26@dartmouth.edu" className="underline underline-offset-2 hover:opacity-70 transition-opacity">
-              christian.k.nyamekye.26@dartmouth.edu
+          <p className="text-sm pt-8" style={{ color: fg, opacity: 0.8 }}>
+            let&apos;s grab a coffee:{' '}
+            <a href="mailto:christiankingnyamekye@gmail.com" className="underline underline-offset-2 hover:opacity-70 transition-opacity">
+              christiankingnyamekye@gmail.com
             </a>
           </p>
           <p
