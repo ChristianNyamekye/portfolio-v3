@@ -10,6 +10,57 @@ html {
   overflow-y: scroll;
 }
 
+/* ── Footer reveal (vlad-style scroll animation) ── */
+@property --footer-g1 { syntax: "<color>"; inherits: true; initial-value: #b2bdbe; }
+@property --footer-g2 { syntax: "<color>"; inherits: true; initial-value: #b2bdbe; }
+@property --footer-g3 { syntax: "<color>"; inherits: true; initial-value: #b2bdbe; }
+
+:root {
+  --page-reveal: 0;
+  --reveal-distance: 520px;
+  --reveal-offset: 20px;
+  --page-scale-amount-base: 0.05;
+  --page-scale-amount: var(--page-scale-amount-base);
+  --max-shrink-px: 180px;
+  --page-radius-max: 32px;
+  --footer-fg: #ffffff;
+}
+
+@media (max-width: 480px) {
+  :root {
+    --reveal-distance: 760px;
+    --page-scale-amount-base: 0.15;
+    --max-shrink-px: 220px;
+    --page-radius-max: 40px;
+  }
+}
+
+.site-surface {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  background: var(--background);
+  transform-origin: center top;
+  will-change: transform, border-radius;
+  transform: scale(calc(1 - (var(--page-reveal) * var(--page-scale-amount))));
+  border-bottom-left-radius: calc(var(--page-reveal) * var(--page-radius-max));
+  border-bottom-right-radius: calc(var(--page-reveal) * var(--page-radius-max));
+  overflow: hidden;
+}
+
+#site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-surface {
+    box-shadow: none;
+    border-radius: 0;
+    transform: none;
+  }
+}
+
 /* ── Light theme (default) ── */
 :root {
   --background: #f7f5f2;
@@ -40,9 +91,11 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--background);
 }
 
 body {
+  position: relative;
   background: var(--background);
   color: var(--text);
   font-family: 'Sentient', Georgia, serif;

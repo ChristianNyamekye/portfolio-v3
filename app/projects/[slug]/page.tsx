@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import ProjectDetail from '@/components/ProjectDetail'
-import PageTransition from '@/components/PageTransition'
 import AIAssistant from '@/components/AIAssistant'
 import { featuredProjects, meta } from '@/lib/data'
 
@@ -54,9 +53,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   if (!project) notFound()
 
   return (
-    <PageTransition>
+    <>
       <ProjectDetail project={project} />
       <AIAssistant />
-    </PageTransition>
+    </>
   )
 }

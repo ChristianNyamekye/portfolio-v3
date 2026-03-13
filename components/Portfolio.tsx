@@ -100,7 +100,7 @@ const categories: Record<string, string> = {
 
 export default function Portfolio() {
   return (
-    <div className="max-w-2xl mx-auto px-6 min-h-screen flex flex-col">
+    <div className="max-w-2xl mx-auto px-6 pb-12 min-h-screen flex flex-col">
 
       {/* Header */}
       <header className="pt-8 pb-0">
@@ -114,7 +114,7 @@ export default function Portfolio() {
               />
             </div>
             <div>
-              <h1 className="text-sm font-medium tracking-tight">Christian Nyamekye</h1>
+              <h1 className="text-sm italic font-medium tracking-tight">Christian Nyamekye</h1>
               <span className="text-[11px] text-[var(--muted)] italic"> &mdash; {hero.eyebrow}</span>
             </div>
           </div>
@@ -225,11 +225,8 @@ export default function Portfolio() {
         </Collapsible>
       </div>
 
-      {/* Footer - pushed to bottom */}
-      <footer className="mt-auto pt-8 pb-6 text-xs text-[var(--muted)] flex items-center justify-between">
-        <p>Dartmouth &apos;26 &middot; EE &amp; CS</p>
-        <a href={`mailto:${meta.email}`} className="hover:text-[var(--text)] transition-colors">{meta.email}</a>
-      </footer>
+      {/* Spacer before gradient footer */}
+      <div className="mt-auto" />
     </div>
   )
 }

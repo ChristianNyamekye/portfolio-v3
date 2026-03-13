@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import LandingPage from '@/components/LandingPage'
 import Portfolio from '@/components/Portfolio'
 import AIAssistant from '@/components/AIAssistant'
-import SmoothScroll from '@/components/SmoothScroll'
 
 type Phase = 'landing' | 'portfolio'
 
@@ -38,17 +37,15 @@ export default function Home() {
       )}
 
       {phase === 'portfolio' && (
-        <motion.main
+        <motion.div
           key="portfolio"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="relative min-h-screen bg-[var(--background)]"
         >
-          <SmoothScroll />
           <Portfolio />
           <AIAssistant />
-        </motion.main>
+        </motion.div>
       )}
     </AnimatePresence>
   )
