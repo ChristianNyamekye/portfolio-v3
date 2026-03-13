@@ -38,6 +38,7 @@ html {
 .site-surface {
   position: relative;
   z-index: 2;
+  min-height: 100vh;
   background: var(--background);
   transform-origin: center top;
   will-change: transform, border-radius;

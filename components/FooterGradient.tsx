@@ -13,6 +13,9 @@ const COLOR_STOPS = [
   { hour: 22, g1: '#1e1145', g2: '#0f172a', g3: '#0a0e27' },
 ]
 
+const MY_TIMEZONE = 'America/New_York'
+const MY_CITY = 'New York'
+
 function clamp01(v: number) { return Math.min(1, Math.max(0, v)) }
 
 function hexToRgb(hex: string) {
@@ -57,28 +60,14 @@ function interpolateGradient(frac: number) {
   return { g1: lerpColor(a.g1, b.g1, t), g2: lerpColor(a.g2, b.g2, t), g3: lerpColor(a.g3, b.g3, t) }
 }
 
-/** Get browser timezone + city name */
-function getBrowserLocation() {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-    const city = tz.split('/').pop()?.replace(/_/g, ' ') || ''
-    return { timezone: tz, city }
-  } catch {
-    return null
-  }
-}
-
-function LocalTime({ timezone }: { timezone: string }) {
+function LocalTime() {
   const [time, setTime] = useState<string | null>(null)
   const [iso, setIso] = useState<string | null>(null)
 
   useEffect(() => {
-    let fmt: Intl.DateTimeFormat
-    try {
-      fmt = new Intl.DateTimeFormat('en-US', {
-        timeZone: timezone, hour: 'numeric', minute: '2-digit', hour12: true,
-      })
-    } catch { return }
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: MY_TIMEZONE, hour: 'numeric', minute: '2-digit', hour12: true,
+    })
     function tick() {
       const now = new Date()
       setTime(fmt.format(now).toLowerCase())
@@ -87,29 +76,20 @@ function LocalTime({ timezone }: { timezone: string }) {
     tick()
     const id = setInterval(tick, 60000)
     return () => clearInterval(id)
-  }, [timezone])
+  }, [])
 
   return <time dateTime={iso ?? undefined}>{time ?? ''}</time>
 }
 
 export default function FooterGradient() {
-  const [location, setLocation] = useState<{ timezone: string; city: string } | null>(null)
   const [colors, setColors] = useState({ g1: '#0a0e27', g2: '#1a1145', g3: '#2d1b69' })
   const [fg, setFg] = useState('#ffffff')
-  const [visible, setVisible] = useState(false)
-
-  // Get location from browser
-  useEffect(() => {
-    const loc = getBrowserLocation()
-    if (loc) setLocation(loc)
-  }, [])
+  const [reveal, setReveal] = useState(0)
 
   // Update gradient colors based on time
   useEffect(() => {
-    const tz = location?.timezone || 'America/New_York'
-
     function update() {
-      const { hour, minute, second } = getTimeInZone(tz)
+      const { hour, minute, second } = getTimeInZone(MY_TIMEZONE)
       const frac = hour + minute / 60 + second / 3600
       const grad = interpolateGradient(frac)
       setColors(grad)
@@ -120,10 +100,7 @@ export default function FooterGradient() {
 
     update()
 
-    // Fade in after portfolio has settled
-    const revealTimeout = setTimeout(() => setVisible(true), 800)
-
-    const { second } = getTimeInZone(tz)
+    const { second } = getTimeInZone(MY_TIMEZONE)
     let intervalCleanup = () => {}
     const syncTimeout = setTimeout(() => {
       update()
@@ -132,30 +109,49 @@ export default function FooterGradient() {
     }, (60 - second) * 1000)
 
     return () => {
-      clearTimeout(revealTimeout)
       clearTimeout(syncTimeout)
       intervalCleanup()
     }
-  }, [location])
+  }, [])
+
+  // Track --page-reveal to control gradient visibility
+  // Gradient only shows when user scrolls near the footer
+  useEffect(() => {
+    let raf = 0
+    function poll() {
+      const val = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--page-reveal')
+      )
+      setReveal(Number.isFinite(val) ? val : 0)
+      raf = requestAnimationFrame(poll)
+    }
+    raf = requestAnimationFrame(poll)
+    return () => cancelAnimationFrame(raf)
+  }, [])
 
   const gradientStyle = `linear-gradient(180deg, ${colors.g1} 20%, ${colors.g2} 55%, ${colors.g3} 100%)`
 
-  // Set html bg to bottom gradient color immediately (no gap between footer and page bottom)
+  // Only set html bg when gradient is actually revealing
   useEffect(() => {
-    document.documentElement.style.setProperty('background', colors.g3)
+    if (reveal > 0.01) {
+      document.documentElement.style.setProperty('background', colors.g3)
+    } else {
+      document.documentElement.style.removeProperty('background')
+    }
     return () => {
       document.documentElement.style.removeProperty('background')
     }
-  }, [colors.g3])
+  }, [reveal > 0.01, colors.g3])
 
   return (
     <>
-      {/* Fixed gradient background — unmounts with portfolio */}
+      {/* Fixed gradient — only visible when scrolling near footer (tied to --page-reveal) */}
       <div
-        className="fixed inset-0 z-0 pointer-events-none transition-opacity duration-600"
+        className="fixed inset-0 z-0 pointer-events-none"
         style={{
           background: gradientStyle,
-          opacity: visible ? 1 : 0,
+          opacity: reveal,
+          transition: 'opacity 0.15s ease-out',
         }}
       />
 
@@ -164,13 +160,11 @@ export default function FooterGradient() {
         className="relative z-[1] w-full pt-12 sm:pt-24 pb-16 sm:pb-32"
       >
         <div className="mx-auto w-full max-w-2xl px-8 text-center flex flex-col gap-1.5">
-          {location && (
-            <p className="text-sm leading-relaxed pt-2" style={{ color: fg }}>
-              Right now I&apos;m in {location.city}, where it&apos;s <LocalTime timezone={location.timezone} />
-            </p>
-          )}
+          <p className="text-sm leading-relaxed pt-2" style={{ color: fg }}>
+            Right now I&apos;m in {MY_CITY}, where it&apos;s <LocalTime />
+          </p>
           <p
-            className={`text-sm italic font-medium tracking-tight ${location ? 'pt-12' : 'pt-2'}`}
+            className="text-sm italic font-medium tracking-tight pt-12"
             style={{ color: fg, opacity: 0.7 }}
           >
             &copy; {new Date().getFullYear()}, Christian Nyamekye

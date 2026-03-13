@@ -9,26 +9,14 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const [showFooter, setShowFooter] = useState(false)
 
   useEffect(() => {
-    // Show footer once portfolio has loaded (or on project pages)
+    // Show footer once portfolio has loaded (set by landing page or on direct visit)
     function check() {
-      const loaded = sessionStorage.getItem('portfolio-loaded')
-      setShowFooter(!!loaded)
+      setShowFooter(!!sessionStorage.getItem('portfolio-loaded'))
     }
     check()
-
-    // Listen for storage changes (when landing page sets the flag)
-    const onStorage = () => check()
-    window.addEventListener('storage', onStorage)
-
-    // Also poll briefly for same-tab sessionStorage changes
-    const interval = setInterval(check, 300)
-    const timeout = setTimeout(() => clearInterval(interval), 10000)
-
-    return () => {
-      window.removeEventListener('storage', onStorage)
-      clearInterval(interval)
-      clearTimeout(timeout)
-    }
+    // Poll for same-tab sessionStorage changes (landing → portfolio transition)
+    const interval = setInterval(check, 200)
+    return () => clearInterval(interval)
   }, [])
 
   return (
