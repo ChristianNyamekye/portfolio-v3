@@ -61,6 +61,7 @@ export default function FooterReveal() {
       if (prefersReduced) {
         current = target
         html.style.setProperty('--page-reveal', String(current))
+        window.dispatchEvent(new CustomEvent('page-reveal', { detail: current }))
         return
       }
 
@@ -83,6 +84,7 @@ export default function FooterReveal() {
       }
 
       html.style.setProperty('--page-reveal', String(current))
+      window.dispatchEvent(new CustomEvent('page-reveal', { detail: current }))
 
       if (current === target) {
         animRaf = 0

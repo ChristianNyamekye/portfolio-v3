@@ -114,19 +114,14 @@ export default function FooterGradient() {
     }
   }, [])
 
-  // Track --page-reveal to control gradient visibility
-  // Gradient only shows when user scrolls near the footer
+  // Listen for scroll-driven reveal value from FooterReveal (event-driven, not polling)
   useEffect(() => {
-    let raf = 0
-    function poll() {
-      const val = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--page-reveal')
-      )
-      setReveal(Number.isFinite(val) ? val : 0)
-      raf = requestAnimationFrame(poll)
+    function onReveal(e: Event) {
+      const val = (e as CustomEvent).detail
+      setReveal(typeof val === 'number' ? val : 0)
     }
-    raf = requestAnimationFrame(poll)
-    return () => cancelAnimationFrame(raf)
+    window.addEventListener('page-reveal', onReveal)
+    return () => window.removeEventListener('page-reveal', onReveal)
   }, [])
 
   const gradientStyle = `linear-gradient(180deg, ${colors.g1} 20%, ${colors.g2} 55%, ${colors.g3} 100%)`
