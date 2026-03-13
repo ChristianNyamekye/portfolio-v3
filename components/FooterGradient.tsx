@@ -56,22 +56,15 @@ function interpolateGradient(frac: number) {
   return { g1: lerpColor(a.g1, b.g1, t), g2: lerpColor(a.g2, b.g2, t), g3: lerpColor(a.g3, b.g3, t) }
 }
 
-/** Derive city name from browser timezone */
-function getCityFromTimezone(): string {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone // e.g. "America/New_York"
-    const city = tz.split('/').pop()?.replace(/_/g, ' ') ?? ''
-    // Common overrides for cleaner display
-    const overrides: Record<string, string> = {
-      'New York': 'New York',
-      'Los Angeles': 'Los Angeles',
-      'San Francisco': 'San Francisco',
-      'Chicago': 'Chicago',
-    }
-    return overrides[city] || city
-  } catch {
-    return 'New York'
-  }
+/**
+ * YOUR location — update this when you move.
+ * timezone: IANA timezone string (for accurate local time)
+ * city: display name shown in the footer
+ */
+const MY_LOCATION = {
+  timezone: 'America/New_York',
+  city: 'New York',
+  // When you move to SF: timezone: 'America/Los_Angeles', city: 'San Francisco'
 }
 
 function FooterTimeGradient() {
@@ -80,10 +73,8 @@ function FooterTimeGradient() {
     html.dataset.footerGradient = 'on'
     html.dataset.footerGradientReady = '0'
 
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-
     function update() {
-      const { hour, minute, second } = getTimeInZone(tz)
+      const { hour, minute, second } = getTimeInZone(MY_LOCATION.timezone)
       const frac = hour + minute / 60 + second / 3600
       const { g1, g2, g3 } = interpolateGradient(frac)
 
@@ -111,7 +102,7 @@ function FooterTimeGradient() {
     update()
     requestAnimationFrame(() => { html.dataset.footerGradientReady = '1' })
 
-    const { second } = getTimeInZone(tz)
+    const { second } = getTimeInZone(MY_LOCATION.timezone)
     const timeout = setTimeout(() => {
       update()
       const interval = setInterval(update, 60000)
@@ -130,9 +121,8 @@ function LocalTime() {
   const [iso, setIso] = useState<string | null>(null)
 
   useEffect(() => {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
     const fmt = new Intl.DateTimeFormat('en-US', {
-      timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true,
+      timeZone: MY_LOCATION.timezone, hour: 'numeric', minute: '2-digit', hour12: true,
     })
     function tick() {
       const now = new Date()
@@ -148,11 +138,7 @@ function LocalTime() {
 }
 
 export default function FooterGradient() {
-  const [city, setCity] = useState('New York')
-
-  useEffect(() => {
-    setCity(getCityFromTimezone())
-  }, [])
+  const city = MY_LOCATION.city
 
   return (
     <>
