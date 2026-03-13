@@ -132,8 +132,9 @@ export default function FooterGradient() {
   const gradientStyle = `linear-gradient(180deg, ${colors.g1} 20%, ${colors.g2} 55%, ${colors.g3} 100%)`
 
   // Only set html bg when gradient is actually revealing
+  const isRevealing = reveal > 0.01
   useEffect(() => {
-    if (reveal > 0.01) {
+    if (isRevealing) {
       document.documentElement.style.setProperty('background', colors.g3)
     } else {
       document.documentElement.style.removeProperty('background')
@@ -141,7 +142,7 @@ export default function FooterGradient() {
     return () => {
       document.documentElement.style.removeProperty('background')
     }
-  }, [reveal > 0.01, colors.g3])
+  }, [isRevealing, colors.g3])
 
   return (
     <>
