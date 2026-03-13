@@ -73,15 +73,21 @@ function FeaturedCard({
       ref={ref}
       initial={{ opacity: 0, y: 36 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, ease, delay: index * 0.1 }}
-      className="group grid grid-cols-1 lg:grid-cols-[1fr_1fr] rounded-2xl overflow-hidden border border-border bg-surface transition-all duration-300 hover:border-border-bright"
+      transition={{ duration: 0.8, ease, delay: index * 0.12 }}
+      className="group grid grid-cols-1 lg:grid-cols-[1fr_1fr] rounded-2xl overflow-hidden border border-border bg-surface transition-all duration-500 hover:border-accent/30 hover:shadow-xl hover:shadow-accent/5"
     >
       {/* Media */}
       <div className="relative overflow-hidden aspect-video lg:aspect-auto min-h-[240px] bg-surface-2">
         <ProjectMedia
           project={project}
-          className="transition-transform duration-700 group-hover:scale-[1.03]"
+          className="transition-transform duration-700 group-hover:scale-[1.04]"
         />
+        {/* Hover overlay with project number */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
+          <span className="text-white/60 text-xs font-mono tracking-wider">
+            {String(index + 1).padStart(2, '0')} / {String(featuredProjects.length).padStart(2, '0')}
+          </span>
+        </div>
         {/* Gradient overlay so media edge merges into the card */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-surface/50 hidden lg:block" />
       </div>
@@ -92,14 +98,11 @@ function FeaturedCard({
           {/* Meta row */}
           <div className="flex items-center gap-3 mb-5">
             <StatusBadge status={project.status} />
-            <span className="text-xs font-mono text-subtle">
-              {String(index + 1).padStart(2, '0')} / featured
-            </span>
           </div>
 
           {/* Name */}
           <h3
-            className="text-display font-semibold text-text mb-2 transition-colors duration-200 group-hover:text-text"
+            className="text-display font-semibold text-text mb-2 transition-colors duration-300 group-hover:text-accent"
             style={{ fontSize: 'clamp(1.75rem, 3vw, 2.5rem)' }}
           >
             {project.name}
@@ -107,7 +110,7 @@ function FeaturedCard({
 
           {/* Tagline */}
           {project.tagline && (
-            <p className="text-accent text-sm font-medium mb-4 leading-snug">
+            <p className="text-accent/80 text-sm font-medium mb-4 leading-snug">
               {project.tagline}
             </p>
           )}
@@ -133,7 +136,7 @@ function FeaturedCard({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="View on GitHub"
-              className="flex items-center gap-1.5 text-xs font-mono text-muted hover:text-text border border-border hover:border-border-bright px-3 py-2 rounded-lg transition-all duration-200"
+              className="flex items-center gap-1.5 text-xs font-mono text-muted hover:text-text border border-border hover:border-accent/40 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer"
             >
               <Github size={13} />
               GitHub
@@ -145,7 +148,8 @@ function FeaturedCard({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Visit project"
-              className="flex items-center gap-1.5 text-xs font-mono text-accent hover:text-blue-400 border border-accent/30 hover:border-accent/60 px-3 py-2 rounded-lg transition-all duration-200"
+              className="flex items-center gap-1.5 text-xs font-mono hover:text-accent border border-accent/30 hover:border-accent/60 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer"
+              style={{ color: 'var(--accent)' }}
             >
               <ExternalLink size={13} />
               Visit

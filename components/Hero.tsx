@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Github, Linkedin, Twitter, Instagram, ArrowRight } from 'lucide-react'
+import { Github, Linkedin, Twitter, Instagram, ArrowRight, ArrowDown } from 'lucide-react'
 import { hero, meta } from '@/lib/data'
 
 const socials = [
@@ -19,20 +19,25 @@ export default function Hero() {
       id="hero"
       className="relative min-h-screen flex flex-col justify-center overflow-hidden"
     >
-      {/* Subtle vignette at bottom — blends into next section */}
+      {/* Ambient gradient orbs */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-[0.06] blur-3xl"
+        style={{ background: 'radial-gradient(circle, var(--accent), transparent 70%)' }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full opacity-[0.04] blur-3xl"
+        style={{ background: 'radial-gradient(circle, var(--accent), transparent 70%)' }}
+      />
+
+      {/* Bottom vignette */}
       <div
         aria-hidden
         className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background to-transparent z-10"
       />
 
-      {/* Very subtle accent glow — top-right corner, faint */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full opacity-[0.04]"
-        style={{ background: 'radial-gradient(circle, #3b82f6, transparent 70%)' }}
-      />
-
-      {/* ── Content ─────────────────────────────────────────── */}
+      {/* Content */}
       <div className="relative z-10 max-w-[1400px] mx-auto section-padding w-full pt-36 pb-24">
         <motion.div
           initial="hidden"
@@ -41,9 +46,9 @@ export default function Hero() {
           className="max-w-5xl"
         >
 
-          {/* Eyebrow — role indicator with live dot */}
+          {/* Eyebrow */}
           <motion.div
-            variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } } }}
+            variants={{ hidden: { opacity: 0, x: -20 }, show: { opacity: 1, x: 0, transition: { duration: 0.6, ease } } }}
             className="flex items-center gap-2.5 mb-10"
           >
             <div className="status-dot-active" />
@@ -57,31 +62,34 @@ export default function Hero() {
             </a>
           </motion.div>
 
-          {/* Name — editorial serif display */}
+          {/* Name — Space Grotesk display + Sentient italic accent */}
           <motion.h1
-            variants={{ hidden: { opacity: 0, y: 32 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease } } }}
+            variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transition: { duration: 0.9, ease } } }}
             className="text-display font-semibold mb-6"
-            style={{ fontSize: 'clamp(3.5rem, 9vw, 8.5rem)', lineHeight: 1.0, letterSpacing: '-0.03em' }}
+            style={{ fontSize: 'clamp(3.5rem, 9vw, 8.5rem)', lineHeight: 1.0, letterSpacing: '-0.04em' }}
           >
             <span className="block text-text">Christian</span>
-            <span className="block text-display-italic" style={{ color: 'var(--text-dim)' }}>
+            <span className="block text-display-italic" style={{ color: 'var(--muted)' }}>
               Nyamekye.
             </span>
           </motion.h1>
 
-          {/* Headline — secondary display line */}
+          {/* Subline with highlighted keywords */}
           <motion.p
             variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease } } }}
             className="text-xl md:text-2xl font-light text-muted mb-5 max-w-2xl leading-relaxed"
             style={{ letterSpacing: '-0.01em' }}
           >
-            {hero.subline}
+            From <span className="text-text font-normal">embedded systems</span> and{' '}
+            <span className="text-text font-normal">robotics</span> to full-stack platforms and{' '}
+            <span className="text-text font-normal">applied ML</span> — I build technology that
+            bridges hardware and software to solve real problems.
           </motion.p>
 
-          {/* Rule */}
+          {/* Animated rule */}
           <motion.div
-            variants={{ hidden: { opacity: 0, scaleX: 0 }, show: { opacity: 1, scaleX: 1, transition: { duration: 0.7, ease } } }}
-            className="origin-left rule-gradient mb-10 max-w-sm"
+            variants={{ hidden: { opacity: 0, scaleX: 0 }, show: { opacity: 1, scaleX: 1, transition: { duration: 0.8, ease } } }}
+            className="origin-left h-px bg-gradient-to-r from-accent/60 via-accent/20 to-transparent mb-10 max-w-sm"
           />
 
           {/* CTAs */}
@@ -91,7 +99,8 @@ export default function Hero() {
           >
             <a
               href={hero.cta.href}
-              className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-white text-sm font-medium transition-all duration-200 hover:bg-accent-dim shadow-lg shadow-accent/20"
+              className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-accent/25"
+              style={{ background: 'var(--accent)' }}
             >
               {hero.cta.label}
               <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -99,7 +108,7 @@ export default function Hero() {
 
             <a
               href={hero.ctaSecondary.href}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border text-text-dim text-sm font-medium transition-all duration-200 hover:border-border-bright hover:text-text"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border text-dim text-sm font-medium transition-all duration-200 hover:border-accent/40 hover:text-text"
             >
               {hero.ctaSecondary.label}
             </a>
@@ -117,32 +126,31 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="p-2.5 rounded-lg text-subtle hover:text-text hover:bg-surface-2 border border-transparent hover:border-border transition-all duration-200"
+                className="p-2.5 rounded-lg text-muted hover:text-accent hover:bg-accent/5 transition-all duration-200 cursor-pointer"
               >
                 <Icon size={17} />
               </a>
             ))}
 
             <div className="mx-4 h-px w-12 bg-border" />
-            <span className="text-xs font-mono text-subtle select-all">{meta.email}</span>
+            <span className="text-xs font-mono text-muted select-all">{meta.email}</span>
           </motion.div>
 
         </motion.div>
       </div>
 
-      {/* Scroll nudge */}
+      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.2, duration: 0.6 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
       >
         <motion.div
-          animate={{ y: [0, 7, 0] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-4 h-7 rounded-full border border-subtle flex justify-center pt-1.5"
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <div className="w-0.5 h-2 rounded-full bg-subtle" />
+          <ArrowDown size={16} className="text-muted/50" />
         </motion.div>
       </motion.div>
     </section>

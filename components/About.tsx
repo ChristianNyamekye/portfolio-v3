@@ -55,7 +55,7 @@ export default function About() {
               style={{ fontSize: 'clamp(2rem, 4vw, 3.25rem)' }}
             >
               Hardware + software +{' '}
-              <em className="text-display-italic" style={{ color: 'var(--text-dim)' }}>
+              <em className="text-display-italic" style={{ color: 'var(--muted)' }}>
                 AI in one person.
               </em>
             </motion.h2>

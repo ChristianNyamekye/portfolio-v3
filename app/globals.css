@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=sentient@400,400i,500,500i,600,700&display=swap');
 
 @tailwind base;
@@ -63,25 +65,27 @@ html {
 
 /* ── Light theme (default) ── */
 :root {
-  --background: #f7f5f2;
-  --surface: #edebe8;
-  --border: #dbd8d3;
-  --text: #1a1a1a;
-  --dim: #4a4a4a;
-  --muted: #8a8a8a;
-  --accent: #2563eb;
+  --background: #fafaf9;
+  --surface: #f0efed;
+  --border: #e0ddd8;
+  --text: #18181b;
+  --dim: #3f3f46;
+  --muted: #71717a;
+  --accent: #6366f1;
+  --accent-soft: rgba(99, 102, 241, 0.08);
 }
 
 /* ── Dark theme (system preference) ── */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #111111;
-    --surface: #1a1a1a;
-    --border: #2a2a2a;
-    --text: #e8e6e3;
-    --dim: #a0a0a0;
-    --muted: #6b6b6b;
-    --accent: #5b8def;
+    --background: #0a0a0b;
+    --surface: #141416;
+    --border: #27272a;
+    --text: #fafaf9;
+    --dim: #a1a1aa;
+    --muted: #71717a;
+    --accent: #818cf8;
+    --accent-soft: rgba(129, 140, 248, 0.1);
   }
 }
 
@@ -98,15 +102,24 @@ body {
   position: relative;
   background: var(--background);
   color: var(--text);
-  font-family: 'Sentient', Georgia, serif;
+  font-family: 'Archivo', system-ui, sans-serif;
   line-height: 1.7;
   overflow-x: hidden;
   font-size: 15px;
   transition: background-color 0.3s, color 0.3s;
 }
 
+.text-display {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+.text-display-italic {
+  font-family: 'Sentient', Georgia, serif;
+  font-style: italic;
+}
+
 ::selection {
-  background: rgba(37, 99, 235, 0.15);
+  background: var(--accent-soft);
   color: var(--text);
 }
 
