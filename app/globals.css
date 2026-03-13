@@ -23,13 +23,7 @@ html {
   --page-scale-amount: var(--page-scale-amount-base);
   --max-shrink-px: 180px;
   --page-radius-max: 32px;
-  --footer-g1: #070a14;
-  --footer-g2: #0b1533;
-  --footer-g3: #1a2a5e;
   --footer-fg: #ffffff;
-  --footer-link-bg: color-mix(in oklab, #ffffff 18%, transparent);
-  --footer-link-hover-bg: #ffffff;
-  --footer-link-hover-fg: #111110;
 }
 
 @media (max-width: 480px) {
@@ -41,21 +35,32 @@ html {
   }
 }
 
+html {
+  background: var(--background);
+}
+
 html[data-footer-gradient] {
-  background: var(--footer-g3);
+  background: var(--footer-g3, var(--background));
 }
 
 html[data-footer-gradient-ready="1"] {
   transition: --footer-g1 60s linear, --footer-g2 60s linear, --footer-g3 60s linear;
 }
 
-html[data-footer-gradient] body::before {
+/* Gradient overlay — hidden until gradient is ready */
+body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, var(--footer-g1) 20%, var(--footer-g2) 55%, var(--footer-g3) 100%);
+  background: linear-gradient(180deg, var(--footer-g1, transparent) 20%, var(--footer-g2, transparent) 55%, var(--footer-g3, transparent) 100%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+html[data-footer-gradient] body::before {
+  opacity: 1;
 }
 
 .site-surface {
