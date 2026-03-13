@@ -18,7 +18,8 @@ const config: Config = {
         text: 'var(--text)',
       },
       fontFamily: {
-        sans: ['Sentient', 'Georgia', 'serif'],
+        sans: ['Archivo', 'system-ui', 'sans-serif'],
+        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
         serif: ['Sentient', 'Georgia', 'serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
