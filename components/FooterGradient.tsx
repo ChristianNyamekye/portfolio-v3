@@ -140,15 +140,13 @@ export default function FooterGradient() {
 
   const gradientStyle = `linear-gradient(180deg, ${colors.g1} 20%, ${colors.g2} 55%, ${colors.g3} 100%)`
 
-  // Set html bg to bottom gradient color (visible below the footer)
+  // Set html bg to bottom gradient color immediately (no gap between footer and page bottom)
   useEffect(() => {
-    if (visible) {
-      document.documentElement.style.background = colors.g3
-    }
+    document.documentElement.style.setProperty('background', colors.g3)
     return () => {
-      document.documentElement.style.background = ''
+      document.documentElement.style.removeProperty('background')
     }
-  }, [visible, colors.g3])
+  }, [colors.g3])
 
   return (
     <>
@@ -164,7 +162,6 @@ export default function FooterGradient() {
       <footer
         id="site-footer"
         className="relative z-[1] w-full pt-12 sm:pt-24 pb-16 sm:pb-32"
-        style={{ background: visible ? colors.g3 : 'transparent' }}
       >
         <div className="mx-auto w-full max-w-2xl px-8 text-center flex flex-col gap-1.5">
           {location && (

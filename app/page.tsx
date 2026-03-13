@@ -5,9 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import LandingPage from '@/components/LandingPage'
 import Portfolio from '@/components/Portfolio'
 import AIAssistant from '@/components/AIAssistant'
-import SmoothScroll from '@/components/SmoothScroll'
-import FooterGradient from '@/components/FooterGradient'
-import FooterReveal from '@/components/FooterReveal'
 
 type Phase = 'landing' | 'portfolio'
 
@@ -45,14 +42,8 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="bg-[var(--background)]"
         >
-          <SmoothScroll />
-          <FooterReveal />
-          <main className="site-surface">
-            <Portfolio />
-          </main>
-          <FooterGradient />
+          <Portfolio />
           <AIAssistant />
         </motion.div>
       )}
